@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { Project } from "@/content/projects";
 import { ProjectMedia } from "@/components/projects/ProjectMedia";
 import { cx } from "@/lib/utils";
@@ -23,10 +24,12 @@ export function WorkIndex({
   const float = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
   const [desktop, setDesktop] = useState(false);
-  const pos = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const [mounted, setMounted] = useState(false);
+  const pos = useRef({ x: -999, y: -999, tx: -999, ty: -999 });
   const activeRef = useRef<number | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     const apply = () => setDesktop(mq.matches && !reduce.matches);
@@ -44,14 +47,13 @@ export function WorkIndex({
     let raf = 0;
 
     const tick = () => {
-      pos.current.x += (pos.current.tx - pos.current.x) * 0.14;
-      pos.current.y += (pos.current.ty - pos.current.y) * 0.14;
+      pos.current.x += (pos.current.tx - pos.current.x) * 0.16;
+      pos.current.y += (pos.current.ty - pos.current.y) * 0.16;
       const node = float.current;
       if (node) {
         const visible = activeRef.current !== null;
-        node.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-42%, -50%)`;
+        node.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
         node.style.opacity = visible ? "1" : "0";
-        node.style.visibility = visible ? "visible" : "hidden";
       }
       raf = requestAnimationFrame(tick);
     };
@@ -60,45 +62,54 @@ export function WorkIndex({
     return () => cancelAnimationFrame(raf);
   }, [desktop]);
 
+  const preview =
+    desktop && mounted
+      ? createPortal(
+          <div
+            ref={float}
+            aria-hidden
+            className="pointer-events-none fixed top-0 left-0 z-[60] h-[240px] w-[340px] overflow-hidden bg-void-3 opacity-0 shadow-[0_24px_80px_rgba(0,0,0,0.55)] transition-opacity duration-200 lg:h-[300px] lg:w-[420px]"
+            style={{ transform: "translate3d(-999px, -999px, 0)", willChange: "transform, opacity" }}
+          >
+            {projects.map((project, index) => {
+              const media = projectThumb(project);
+              if (media.kind !== "image") {
+                return (
+                  <div
+                    key={project.slug}
+                    className={cx(
+                      "absolute inset-0",
+                      active === index ? "opacity-100" : "opacity-0",
+                    )}
+                  >
+                    <ProjectMedia media={media} sizes="420px" />
+                  </div>
+                );
+              }
+              return (
+                <Image
+                  key={project.slug}
+                  src={media.src}
+                  alt=""
+                  width={840}
+                  height={600}
+                  priority={index < 3}
+                  className={cx(
+                    "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
+                    active === index ? "opacity-100" : "opacity-0",
+                  )}
+                  sizes="420px"
+                />
+              );
+            })}
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <div className="relative">
-      {desktop ? (
-        <div
-          ref={float}
-          aria-hidden
-          className="pointer-events-none fixed top-0 left-0 z-40 h-[220px] w-[320px] overflow-hidden bg-void-3 opacity-0 shadow-[0_20px_60px_rgba(0,0,0,0.45)] lg:h-[280px] lg:w-[400px]"
-          style={{ visibility: "hidden", willChange: "transform, opacity" }}
-        >
-          {projects.map((project, index) => {
-            const media = projectThumb(project);
-            const isActive = active === index;
-            return (
-              <div
-                key={project.slug}
-                className={cx(
-                  "absolute inset-0 transition-opacity duration-250",
-                  isActive ? "opacity-100" : "opacity-0",
-                )}
-              >
-                <div className="relative h-full w-full">
-                  {media.kind === "image" ? (
-                    <Image
-                      src={media.src}
-                      alt=""
-                      fill
-                      sizes="400px"
-                      priority={index < 3}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <ProjectMedia media={media} sizes="400px" />
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+      {preview}
 
       <div className="flex flex-col border-t border-line">
         {projects.map((project, index) => {
@@ -113,15 +124,17 @@ export function WorkIndex({
                 if (!desktop) return;
                 activeRef.current = index;
                 setActive(index);
-                pos.current.tx = event.clientX + 28;
-                pos.current.ty = event.clientY;
-                pos.current.x = event.clientX + 28;
-                pos.current.y = event.clientY;
+                const x = event.clientX + 28;
+                const y = event.clientY - 24;
+                pos.current.tx = x;
+                pos.current.ty = y;
+                pos.current.x = x;
+                pos.current.y = y;
               }}
               onPointerMove={(event) => {
                 if (!desktop) return;
                 pos.current.tx = event.clientX + 28;
-                pos.current.ty = event.clientY;
+                pos.current.ty = event.clientY - 24;
               }}
               onPointerLeave={() => {
                 if (!desktop) return;

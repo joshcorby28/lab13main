@@ -24,7 +24,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div ref={ref} className="will-change-transform">
+    <div ref={ref}>
       {children}
     </div>
   );

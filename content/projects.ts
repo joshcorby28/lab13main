@@ -153,14 +153,14 @@ export const projects: Project[] = [
     featured: true,
     hero: {
       kind: "image",
-      src: "/images/projects/maeving-1.jpg",
-      alt: "Maeving electric motorcycle imagery",
+      src: "/images/projects/maeving-2.jpg",
+      alt: "Maeving brand visual",
     },
     gallery: [
       {
         kind: "image",
-        src: "/images/projects/maeving-2.jpg",
-        alt: "Maeving brand visual",
+        src: "/images/projects/maeving-1.jpg",
+        alt: "Maeving store visual from Lab 13 portfolio",
       },
     ],
     overview:
