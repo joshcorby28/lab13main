@@ -6,7 +6,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "About",
   description:
-    "Lab 13 is a family-run Shopify studio founded by Joshua and Hayden Corby — 18 years of combined experience in Shopify Plus, development and design.",
+    "Lab 13 is a small family-run studio building thoughtfully crafted Shopify Plus stores and custom apps.",
   path: "/about",
 });
 

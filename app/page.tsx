@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { HomeHero } from "@/components/hero/HomeHero";
-import { ProjectList } from "@/components/projects/ProjectList";
+import { WorkIndex } from "@/components/projects/WorkIndex";
 import { ServiceIndex } from "@/components/services/ServiceIndex";
 import { AboutPreview } from "@/components/about/AboutPreview";
-import { ShopifyExpertise } from "@/components/expertise/ShopifyExpertise";
-import { CtaBand } from "@/components/cta/CtaBand";
+import { ContactOversize } from "@/components/cta/CtaBand";
 import { Container } from "@/components/ui/Container";
 import { getFeaturedProjects } from "@/content/projects";
 import { pageMetadata } from "@/lib/seo";
@@ -12,7 +11,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Lab 13",
   description:
-    "A small family-run studio designing and developing thoughtfully crafted Shopify Plus stores, custom apps and migrations.",
+    "Thoughtfully crafted Shopify Plus stores & apps. A small family-run studio building Shopify Plus stores and custom apps.",
   path: "/",
 });
 
@@ -23,34 +22,38 @@ export default function HomePage() {
     <>
       <HomeHero />
 
-      <section>
-        <Container className="pt-8 pb-6 lg:pt-12">
+      <section id="work">
+        <Container className="pt-8 pb-6 lg:pt-14">
           <div className="flex items-end justify-between gap-6">
             <div>
               <p className="eyebrow text-muted">Selected work</p>
               <h2 className="display mt-4 text-[clamp(2.4rem,5vw,4.4rem)]">
-                Stores we keep in motion.
+                Stores in motion.
               </h2>
             </div>
             <Link
               href="/work"
-              className="hidden text-[0.75rem] tracking-[0.16em] uppercase underline decoration-line underline-offset-8 hover:decoration-ink md:inline"
+              data-cursor="ALL"
+              className="hidden text-[0.75rem] tracking-[0.16em] uppercase underline decoration-line underline-offset-8 hover:decoration-paper md:inline"
             >
               All work
             </Link>
           </div>
         </Container>
         <Container>
-          <ProjectList projects={projects} />
+          <WorkIndex projects={projects} />
           <div className="border-b border-line py-8 md:hidden">
-            <Link href="/work" className="text-[0.75rem] tracking-[0.16em] uppercase underline underline-offset-8">
+            <Link
+              href="/work"
+              className="text-[0.75rem] tracking-[0.16em] uppercase underline underline-offset-8"
+            >
               All work
             </Link>
           </div>
         </Container>
       </section>
 
-      <section>
+      <section id="services">
         <Container className="py-24 lg:py-32">
           <p className="eyebrow text-muted">Services</p>
           <h2 className="display mt-4 max-w-[16ch] text-[clamp(2.4rem,5vw,4.6rem)]">
@@ -67,8 +70,7 @@ export default function HomePage() {
       </section>
 
       <AboutPreview />
-      <ShopifyExpertise />
-      <CtaBand title="Have a project in mind?" />
+      <ContactOversize />
     </>
   );
 }

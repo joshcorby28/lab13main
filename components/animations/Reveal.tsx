@@ -1,66 +1,104 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { cx } from "@/lib/utils";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function Reveal({
   children,
   className,
   delay = 0,
-  y = 28,
+  y = 36,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
   y?: number;
 }) {
-  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { autoAlpha: 0, y },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.05,
+          delay,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 88%",
+            once: true,
+          },
+        },
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [delay, y]);
 
   return (
-    <motion.div
-      className={cx(className)}
-      initial={reduce ? false : { opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-export function RevealText({
-  text,
+export function RevealLines({
+  lines,
   className,
+  as: Tag = "h1",
   delay = 0,
-  as: Tag = "p",
 }: {
-  text: string;
+  lines: string[];
   className?: string;
+  as?: "h1" | "h2" | "h3" | "p";
   delay?: number;
-  as?: "p" | "h1" | "h2" | "h3" | "span";
 }) {
-  const reduce = useReducedMotion();
-  const words = text.split(" ");
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    const spans = el.querySelectorAll<HTMLElement>("[data-line]");
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        spans,
+        { yPercent: 115 },
+        {
+          yPercent: 0,
+          duration: 1.15,
+          stagger: 0.1,
+          delay,
+          ease: "power4.out",
+        },
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [delay, lines]);
 
   return (
-    <Tag className={cx(className)}>
-      {words.map((word, index) => (
-        <span key={`${word}-${index}`} className="inline-block overflow-hidden">
-          <motion.span
-            className="inline-block"
-            initial={reduce ? false : { y: "110%" }}
-            whileInView={{ y: "0%" }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{
-              duration: 0.7,
-              delay: delay + index * 0.035,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-          >
-            {word}
-            {index < words.length - 1 ? "\u00A0" : ""}
-          </motion.span>
+    <Tag ref={ref as never} className={className}>
+      {lines.map((line) => (
+        <span key={line} className="block overflow-hidden">
+          <span data-line className="block will-change-transform">
+            {line}
+          </span>
         </span>
       ))}
     </Tag>

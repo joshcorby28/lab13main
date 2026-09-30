@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Instrument_Serif, Inter_Tight } from "next/font/google";
+import { Geist_Mono, Syne, Manrope } from "next/font/google";
 import { Header } from "@/components/navigation/Header";
 import { Footer } from "@/components/footer/Footer";
 import { CustomCursor } from "@/components/ui/CustomCursor";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-const display = Inter_Tight({
+const display = Syne({
   variable: "--font-display",
   subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
-const serif = Instrument_Serif({
-  variable: "--font-serif",
+const body = Manrope({
+  variable: "--font-body",
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -71,23 +71,27 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-GB"
-      className={`${display.variable} ${serif.variable} ${mono.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-paper text-ink">
+      <body className="min-h-full bg-void text-ink">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[120] focus:bg-ink focus:px-4 focus:py-2 focus:text-[var(--paper)]"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[120] focus:bg-paper focus:px-4 focus:py-2 focus:text-void"
         >
           Skip to content
         </a>
-        <CustomCursor />
-        <Header />
-        <main id="main">{children}</main>
-        <Footer />
+        <SmoothScroll>
+          <CustomCursor />
+          <Header />
+          <main id="main" className="page-shell">
+            {children}
+          </main>
+          <Footer />
+        </SmoothScroll>
       </body>
     </html>
   );

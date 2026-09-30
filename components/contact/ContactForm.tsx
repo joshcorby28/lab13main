@@ -31,7 +31,7 @@ export function ContactForm() {
         <select
           name="budget"
           defaultValue=""
-          className="mt-3 w-full appearance-none border-b border-line bg-transparent py-3 text-[1.05rem] outline-none focus:border-ink"
+          className="mt-3 w-full appearance-none border-b border-line bg-void py-3 text-[1.05rem] outline-none focus:border-paper"
         >
           <option value="" disabled>
             Select a range
@@ -49,14 +49,14 @@ export function ContactForm() {
           name="message"
           required
           rows={5}
-          className="mt-3 w-full resize-y border-b border-line bg-transparent py-3 text-[1.05rem] outline-none focus:border-ink"
+          className="mt-3 w-full resize-y border-b border-line bg-transparent py-3 text-[1.05rem] outline-none focus:border-paper"
         />
       </label>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
-          className="bg-ink px-8 py-4 text-[0.75rem] tracking-[0.16em] text-[var(--paper)] uppercase transition-colors hover:bg-accent"
+          className="bg-paper px-8 py-4 text-[0.75rem] tracking-[0.16em] text-[#070707] uppercase transition-colors hover:bg-accent"
         >
           Send message
         </button>
@@ -103,7 +103,7 @@ function Field({
         autoComplete={autoComplete}
         required={required}
         placeholder={placeholder}
-        className="mt-3 w-full border-b border-line bg-transparent py-3 text-[1.05rem] outline-none placeholder:text-muted/60 focus:border-ink"
+        className="mt-3 w-full border-b border-line bg-transparent py-3 text-[1.05rem] outline-none placeholder:text-muted focus:border-paper"
       />
     </label>
   );
