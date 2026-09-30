@@ -21,8 +21,9 @@ export default function WorkPage() {
             Selected projects.
           </h1>
           <p className="mt-6 max-w-xl text-[1.08rem] leading-relaxed text-ink-soft">
-            Shopify and Shopify Plus stores, migrations and ongoing development.
-            The facts below come from the live Lab 13 portfolio — we do not invent results.
+            Shopify and Shopify Plus stores, migrations and ongoing development for
+            brands including Hylo Athletics, Project Cosmetics, Amy Lynn, Maeving and
+            Studio 163.
           </p>
         </Container>
       </section>

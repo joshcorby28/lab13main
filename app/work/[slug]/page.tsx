@@ -49,7 +49,7 @@ export default async function ProjectPage({ params }: PageProps<"/work/[slug]">)
               ))}
             </div>
           </Container>
-          <div className="relative mt-12 aspect-[16/9] overflow-hidden bg-paper-2 lg:mt-16">
+          <div className="relative mt-12 aspect-[16/9] overflow-hidden bg-void-3 lg:mt-16">
             <ProjectMedia media={project.hero} priority sizes="100vw" />
           </div>
         </header>
@@ -122,17 +122,19 @@ export default async function ProjectPage({ params }: PageProps<"/work/[slug]">)
 
           {project.quote ? (
             <blockquote className="mt-16 border-t border-line pt-16">
-              <p className="max-w-3xl font-serif text-[clamp(1.6rem,3vw,2.4rem)] leading-snug italic">
+              <p className="display max-w-3xl text-[clamp(1.6rem,3vw,2.6rem)] leading-[1.15]">
                 “{project.quote.text}”
               </p>
-              <footer className="mt-6 eyebrow text-muted">{project.quote.attribution}</footer>
+              <footer className="mt-6 eyebrow text-muted">
+                {project.quote.attribution}
+              </footer>
             </blockquote>
           ) : null}
 
           {project.gallery.length ? (
             <div className="mt-16 grid gap-4 md:grid-cols-2">
               {project.gallery.map((media, index) => (
-                <div key={index} className="relative aspect-[16/10] overflow-hidden bg-paper-2">
+                <div key={index} className="relative aspect-[16/10] overflow-hidden bg-void-3">
                   <ProjectMedia media={media} sizes="(min-width: 768px) 50vw, 100vw" />
                 </div>
               ))}
@@ -159,7 +161,7 @@ export default async function ProjectPage({ params }: PageProps<"/work/[slug]">)
             <div className="mt-8 grid gap-10 md:grid-cols-2">
               {related.map((item) => (
                 <Link key={item.slug} href={`/work/${item.slug}`} data-cursor="VIEW" className="group">
-                  <div className="relative aspect-[16/10] overflow-hidden bg-paper-2">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-void-3">
                     <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.04]">
                       <ProjectMedia media={item.hero} sizes="(min-width: 768px) 50vw, 100vw" />
                     </div>

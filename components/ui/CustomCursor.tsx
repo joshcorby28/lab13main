@@ -1,16 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "motion/react";
+
+type CursorState = {
+  x: number;
+  y: number;
+  label: string;
+  visible: boolean;
+  hovering: boolean;
+};
 
 export function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
-  const [label, setLabel] = useState("");
-  const [visible, setVisible] = useState(false);
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 380, damping: 32, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 380, damping: 32, mass: 0.4 });
+  const [state, setState] = useState<CursorState>({
+    x: -100,
+    y: -100,
+    label: "",
+    visible: false,
+    hovering: false,
+  });
 
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -25,7 +33,6 @@ export function CustomCursor() {
     apply();
     fine.addEventListener("change", apply);
     reduce.addEventListener("change", apply);
-
     return () => {
       fine.removeEventListener("change", apply);
       reduce.removeEventListener("change", apply);
@@ -36,17 +43,44 @@ export function CustomCursor() {
   useEffect(() => {
     if (!enabled) return;
 
-    const move = (event: PointerEvent) => {
-      x.set(event.clientX);
-      y.set(event.clientY);
-      setVisible(true);
+    let raf = 0;
+    let targetX = -100;
+    let targetY = -100;
+    let currentX = -100;
+    let currentY = -100;
+    let label = "";
+    let hovering = false;
+    let visible = false;
+
+    const render = () => {
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+      setState({
+        x: currentX,
+        y: currentY,
+        label,
+        visible,
+        hovering,
+      });
+      raf = requestAnimationFrame(render);
     };
 
-    const leave = () => setVisible(false);
+    raf = requestAnimationFrame(render);
+
+    const move = (event: PointerEvent) => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      visible = true;
+    };
+
+    const leave = () => {
+      visible = false;
+    };
 
     const over = (event: PointerEvent) => {
       const target = (event.target as HTMLElement | null)?.closest("[data-cursor]");
-      setLabel(target?.getAttribute("data-cursor") ?? "");
+      label = target?.getAttribute("data-cursor") ?? "";
+      hovering = Boolean(target);
     };
 
     window.addEventListener("pointermove", move);
@@ -54,29 +88,41 @@ export function CustomCursor() {
     document.documentElement.addEventListener("mouseleave", leave);
 
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerover", over);
       document.documentElement.removeEventListener("mouseleave", leave);
     };
-  }, [enabled, x, y]);
+  }, [enabled]);
 
   if (!enabled) return null;
 
+  const size = state.hovering ? 72 : 10;
+
   return (
-    <motion.div
+    <div
       aria-hidden
-      className="pointer-events-none fixed top-0 left-0 z-[100] mix-blend-difference"
-      style={{ x: sx, y: sy, translateX: "-50%", translateY: "-50%" }}
+      className="pointer-events-none fixed top-0 left-0 z-[110] mix-blend-difference"
+      style={{
+        transform: `translate3d(${state.x}px, ${state.y}px, 0) translate(-50%, -50%)`,
+        opacity: state.visible ? 1 : 0,
+        transition: "opacity 200ms ease",
+      }}
     >
       <div
-        className={`grid place-items-center rounded-full border border-paper/80 bg-paper text-ink transition-[width,height,opacity] duration-300 ${
-          label ? "h-16 w-16 opacity-100" : "h-3 w-3 opacity-90"
-        } ${visible ? "scale-100" : "scale-0"}`}
+        className="grid place-items-center rounded-full border border-paper bg-paper text-void"
+        style={{
+          width: size,
+          height: size,
+          transition: "width 280ms cubic-bezier(0.16,1,0.3,1), height 280ms cubic-bezier(0.16,1,0.3,1)",
+        }}
       >
-        {label ? (
-          <span className="eyebrow text-[0.55rem] tracking-[0.18em]">{label}</span>
+        {state.label ? (
+          <span className="eyebrow text-[0.55rem] tracking-[0.2em] text-void">
+            {state.label}
+          </span>
         ) : null}
       </div>
-    </motion.div>
+    </div>
   );
 }

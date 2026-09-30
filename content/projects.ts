@@ -73,7 +73,7 @@ export const projects: Project[] = [
       "Full migration from WooCommerce to Shopify for Project Cosmetics.",
     services: ["Shopify migration", "Subscriptions", "Shopify development"],
     technologies: ["Shopify", "Subscriptions", "Customer data migration", "Product catalogue"],
-    liveUrl: "https://www.projectplump.com/",
+    liveUrl: "https://project-cosmetics.com/",
     featured: true,
     hero: {
       kind: "image",
@@ -85,6 +85,11 @@ export const projects: Project[] = [
         kind: "image",
         src: "/images/projects/project-cosmetics-2.jpg",
         alt: "Project Cosmetics product still",
+      },
+      {
+        kind: "image",
+        src: "/images/projects/project-cosmetics-3.jpg",
+        alt: "Project Cosmetics store visual",
       },
     ],
     overview:
@@ -105,7 +110,7 @@ export const projects: Project[] = [
     client: "Amy Lynn",
     industry: "Luxury womenswear",
     summary:
-      "A new Shopify storefront on Prestige for the luxury fashion designer — custom theme work built to convert, with a measurable lift after launch.",
+      "A new Shopify storefront on Prestige for the luxury fashion designer — custom theme work built to convert.",
     intro:
       "Custom theme development on Shopify for luxury fashion and womenswear designer.",
     services: ["Shopify development", "Custom theme", "Conversion"],
@@ -117,7 +122,13 @@ export const projects: Project[] = [
       src: "/images/projects/amy-lynn-1.jpg",
       alt: "Amy Lynn campaign imagery",
     },
-    gallery: [],
+    gallery: [
+      {
+        kind: "image",
+        src: "/images/projects/amy-lynn-hero.jpg",
+        alt: "Amy Lynn storefront visual",
+      },
+    ],
     overview:
       "Working with the team at Amy Lynn we built a brand new Shopify website to showcase their products and gain a higher conversion rate. Working with the Prestige theme we designed and developed a stand out website with loads of custom features to expand the already strong Prestige theme.",
     challenge:
@@ -126,11 +137,6 @@ export const projects: Project[] = [
       "A new Shopify storefront based on Prestige, extended with custom features so the theme could hold a more distinctive, higher-converting experience.",
     development:
       "Theme customisation, new sections and functionality layered onto Prestige, designed around how Amy Lynn actually merchandises and sells.",
-    results: [
-      "Total sales increased by 60%.",
-      "Total sessions increased by 55%.",
-      "Total orders increased by 40%.",
-    ],
   },
   {
     slug: "maeving",
@@ -140,13 +146,23 @@ export const projects: Project[] = [
     summary:
       "Ongoing Shopify development for Maeving — new features, issue resolution, and care for the bike customiser that lets customers build their own electric bike.",
     intro:
-      "Ongoing Shopify development and customiser support for Maeving.",
-    services: ["Shopify development", "Custom functionality", "Retainer"],
-    technologies: ["Shopify", "Custom product customiser", "Frontend development"],
+      "Working on Shopify Plus with the UK’s most popular urban electric bike company.",
+    services: ["Shopify Plus", "Custom functionality", "Retainer"],
+    technologies: ["Shopify Plus", "Custom product customiser", "Frontend development"],
     liveUrl: "https://maeving.com/",
     featured: true,
-    hero: { kind: "field", tone: "steel", label: "Maeving" },
-    gallery: [],
+    hero: {
+      kind: "image",
+      src: "/images/projects/maeving-1.jpg",
+      alt: "Maeving electric motorcycle imagery",
+    },
+    gallery: [
+      {
+        kind: "image",
+        src: "/images/projects/maeving-2.jpg",
+        alt: "Maeving brand visual",
+      },
+    ],
     overview:
       "We’ve been working with Maeving for quite a while now helping with new features, fixing issues and more. We didn’t build the original site but we’ve made sure it keeps working as required.",
     challenge:
@@ -168,8 +184,18 @@ export const projects: Project[] = [
     technologies: ["Shopify Plus", "Custom theme work", "Navigation & merchandising"],
     liveUrl: "https://studio163.de/",
     featured: true,
-    hero: { kind: "field", tone: "cashmere", label: "Studio 163" },
-    gallery: [],
+    hero: {
+      kind: "image",
+      src: "/images/projects/studio-163-1.jpg",
+      alt: "Studio 163 cashmere knitwear imagery",
+    },
+    gallery: [
+      {
+        kind: "image",
+        src: "/images/projects/studio-163-2.png",
+        alt: "Studio 163 brand mark",
+      },
+    ],
     overview:
       "The client sought to completely revamp their outdated website, aiming to create a more modern and user-friendly experience. The objectives were to enhance user satisfaction through a visually appealing design and intuitive navigation while aligning with current luxury fashion trends.",
     challenge:
@@ -178,9 +204,6 @@ export const projects: Project[] = [
       "A fresh, clean Shopify Plus store that transformed the site’s aesthetic and made the catalogue easier to move through.",
     development:
       "A complete rebuild focused on luxury presentation, intuitive navigation and a more contemporary Shopify Plus storefront.",
-    results: [
-      "Improved user engagement and conversion rates following the rebuild.",
-    ],
   },
 ]
 

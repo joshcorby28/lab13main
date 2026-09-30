@@ -74,16 +74,16 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
         </Container>
       </section>
 
-      <section data-nav-theme="dark" className="bg-dark text-paper">
+      <section className="border-t border-line bg-void-2">
         <Container className="py-20 lg:py-28">
-          <p className="eyebrow text-dark-muted">Process</p>
+          <p className="eyebrow text-muted">Process</p>
           <h2 className="display mt-4 text-[clamp(2.2rem,4vw,3.6rem)]">How we take it through.</h2>
           <ol className="mt-12 grid gap-10 md:grid-cols-2">
             {service.process.map((step, index) => (
-              <li key={step.title} className="border-t border-dark-line pt-6">
-                <p className="eyebrow text-dark-muted">{String(index + 1).padStart(2, "0")}</p>
+              <li key={step.title} className="border-t border-line pt-6">
+                <p className="eyebrow text-muted">{String(index + 1).padStart(2, "0")}</p>
                 <h3 className="mt-3 text-[1.4rem] tracking-[-0.03em]">{step.title}</h3>
-                <p className="mt-3 text-[0.98rem] leading-relaxed text-dark-muted">{step.body}</p>
+                <p className="mt-3 text-[0.98rem] leading-relaxed text-ink-soft">{step.body}</p>
               </li>
             ))}
           </ol>
@@ -97,7 +97,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
             <div className="mt-8 grid gap-10 md:grid-cols-2">
               {related.map((project) => (
                 <Link key={project.slug} href={`/work/${project.slug}`} data-cursor="VIEW" className="group">
-                  <div className="relative aspect-[16/10] overflow-hidden bg-paper-2">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-void-3">
                     <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.04]">
                       <ProjectMedia media={project.hero} sizes="(min-width: 768px) 50vw, 100vw" />
                     </div>
