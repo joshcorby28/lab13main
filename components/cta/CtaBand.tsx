@@ -36,7 +36,7 @@ export function ContactOversize({
             <Link
               href="/contact"
               data-cursor="WRITE"
-              className="inline-flex w-fit items-center gap-3 bg-paper px-7 py-4 text-[0.75rem] tracking-[0.16em] text-void uppercase transition-colors hover:bg-accent"
+              className="inline-flex w-fit items-center gap-3 bg-paper px-7 py-4 text-[0.75rem] tracking-[0.16em] text-[#070707] uppercase transition-colors hover:bg-accent"
             >
               Write to us
               <span aria-hidden>→</span>

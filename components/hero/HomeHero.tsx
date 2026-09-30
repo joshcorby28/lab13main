@@ -94,7 +94,7 @@ export function HomeHero() {
             <Link
               href="/contact"
               data-cursor="START"
-              className="bg-paper px-6 py-3.5 text-[0.75rem] tracking-[0.16em] text-void uppercase transition-colors duration-300 hover:bg-accent"
+              className="bg-paper px-6 py-3.5 text-[0.75rem] tracking-[0.16em] text-[#070707] uppercase transition-colors duration-300 hover:bg-accent"
             >
               Start a project
             </Link>

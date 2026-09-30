@@ -56,7 +56,7 @@ export function ContactForm() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
-          className="bg-paper px-8 py-4 text-[0.75rem] tracking-[0.16em] text-void uppercase transition-colors hover:bg-accent"
+          className="bg-paper px-8 py-4 text-[0.75rem] tracking-[0.16em] text-[#070707] uppercase transition-colors hover:bg-accent"
         >
           Send message
         </button>

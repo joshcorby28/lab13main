@@ -2,10 +2,10 @@ import Link from "next/link";
 import { cx } from "@/lib/utils";
 
 const styles = {
-  primary: "bg-paper text-void hover:bg-accent",
+  primary: "bg-paper text-[#070707] hover:bg-accent",
   inverse: "bg-void-2 text-paper hover:bg-void-3",
   ghost:
-    "border border-line-strong bg-transparent hover:bg-paper hover:text-void hover:border-paper",
+    "border border-line-strong bg-transparent hover:bg-paper hover:text-[#070707] hover:border-paper",
 };
 
 export function Button({

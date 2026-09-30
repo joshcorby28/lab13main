@@ -20,11 +20,11 @@ export function WorkIndex({
   projects: Project[];
   numbered?: boolean;
 }) {
-  const root = useRef<HTMLDivElement>(null);
   const float = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
   const [desktop, setDesktop] = useState(false);
   const pos = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const activeRef = useRef<number | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -44,10 +44,14 @@ export function WorkIndex({
     let raf = 0;
 
     const tick = () => {
-      pos.current.x += (pos.current.tx - pos.current.x) * 0.12;
-      pos.current.y += (pos.current.ty - pos.current.y) * 0.12;
-      if (float.current) {
-        float.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-50%, -50%)`;
+      pos.current.x += (pos.current.tx - pos.current.x) * 0.14;
+      pos.current.y += (pos.current.ty - pos.current.y) * 0.14;
+      const node = float.current;
+      if (node) {
+        const visible = activeRef.current !== null;
+        node.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-42%, -50%)`;
+        node.style.opacity = visible ? "1" : "0";
+        node.style.visibility = visible ? "visible" : "hidden";
       }
       raf = requestAnimationFrame(tick);
     };
@@ -57,40 +61,39 @@ export function WorkIndex({
   }, [desktop]);
 
   return (
-    <div ref={root} className="relative">
+    <div className="relative">
       {desktop ? (
         <div
           ref={float}
           aria-hidden
-          className={cx(
-            "pointer-events-none fixed top-0 left-0 z-40 hidden h-[280px] w-[400px] overflow-hidden rounded-[2px] md:block",
-            "transition-[opacity,clip-path] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-            active === null
-              ? "opacity-0 [clip-path:inset(12%_12%_12%_12%)]"
-              : "opacity-100 [clip-path:inset(0%_0%_0%_0%)]",
-          )}
+          className="pointer-events-none fixed top-0 left-0 z-40 h-[220px] w-[320px] overflow-hidden bg-void-3 opacity-0 shadow-[0_20px_60px_rgba(0,0,0,0.45)] lg:h-[280px] lg:w-[400px]"
+          style={{ visibility: "hidden", willChange: "transform, opacity" }}
         >
           {projects.map((project, index) => {
             const media = projectThumb(project);
+            const isActive = active === index;
             return (
               <div
                 key={project.slug}
                 className={cx(
-                  "absolute inset-0 transition-opacity duration-300",
-                  active === index ? "opacity-100" : "opacity-0",
+                  "absolute inset-0 transition-opacity duration-250",
+                  isActive ? "opacity-100" : "opacity-0",
                 )}
               >
-                {media.kind === "image" ? (
-                  <Image
-                    src={media.src}
-                    alt={media.alt}
-                    fill
-                    sizes="400px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <ProjectMedia media={media} sizes="400px" />
-                )}
+                <div className="relative h-full w-full">
+                  {media.kind === "image" ? (
+                    <Image
+                      src={media.src}
+                      alt=""
+                      fill
+                      sizes="400px"
+                      priority={index < 3}
+                      className="object-cover"
+                    />
+                  ) : (
+                    <ProjectMedia media={media} sizes="400px" />
+                  )}
+                </div>
               </div>
             );
           })}
@@ -98,68 +101,71 @@ export function WorkIndex({
       ) : null}
 
       <div className="flex flex-col border-t border-line">
-        {projects.map((project, index) => (
-          <Link
-            key={project.slug}
-            href={`/work/${project.slug}`}
-            data-cursor="VIEW"
-            className="group relative grid grid-cols-12 items-center gap-4 border-b border-line py-7 transition-colors duration-500 hover:bg-void-2 sm:py-9 lg:py-11"
-            onPointerEnter={() => {
-              if (!desktop) return;
-              setActive(index);
-            }}
-            onPointerMove={(event) => {
-              if (!desktop) return;
-              pos.current.tx = event.clientX + 36;
-              pos.current.ty = event.clientY;
-            }}
-            onPointerLeave={() => {
-              if (!desktop) return;
-              setActive(null);
-            }}
-          >
-            {numbered ? (
-              <span className="eyebrow col-span-2 text-muted sm:col-span-1">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-            ) : (
-              <span className="col-span-2 sm:col-span-1" />
-            )}
+        {projects.map((project, index) => {
+          const media = projectThumb(project);
+          return (
+            <Link
+              key={project.slug}
+              href={`/work/${project.slug}`}
+              data-cursor="VIEW"
+              className="group relative grid grid-cols-12 items-center gap-4 border-b border-line py-7 transition-colors duration-500 hover:bg-void-2 sm:py-9 lg:py-11"
+              onPointerEnter={(event) => {
+                if (!desktop) return;
+                activeRef.current = index;
+                setActive(index);
+                pos.current.tx = event.clientX + 28;
+                pos.current.ty = event.clientY;
+                pos.current.x = event.clientX + 28;
+                pos.current.y = event.clientY;
+              }}
+              onPointerMove={(event) => {
+                if (!desktop) return;
+                pos.current.tx = event.clientX + 28;
+                pos.current.ty = event.clientY;
+              }}
+              onPointerLeave={() => {
+                if (!desktop) return;
+                activeRef.current = null;
+                setActive(null);
+              }}
+            >
+              {numbered ? (
+                <span className="eyebrow col-span-2 text-muted sm:col-span-1">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              ) : (
+                <span className="col-span-2 sm:col-span-1" />
+              )}
 
-            <div className="col-span-10 sm:col-span-7 lg:col-span-6">
-              <h3 className="display text-[clamp(1.7rem,4.2vw,3.6rem)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2">
-                {project.title}
-              </h3>
-              <p className="mt-2 max-w-md text-[0.92rem] leading-relaxed text-muted md:hidden">
-                {project.summary}
+              <div className="col-span-10 sm:col-span-7 lg:col-span-6">
+                <h3 className="display text-[clamp(1.7rem,4.2vw,3.6rem)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2">
+                  {project.title}
+                </h3>
+              </div>
+
+              <p className="col-span-12 hidden text-[0.85rem] leading-relaxed text-muted sm:col-span-3 sm:block lg:col-span-3">
+                {project.industry}
               </p>
-            </div>
 
-            <p className="col-span-12 hidden text-[0.85rem] leading-relaxed text-muted sm:col-span-3 sm:block lg:col-span-3">
-              {project.industry}
-            </p>
+              <span className="col-span-12 hidden text-right text-[0.72rem] tracking-[0.16em] text-muted uppercase transition-colors duration-300 group-hover:text-paper sm:col-span-1 sm:block lg:col-span-2">
+                Open
+              </span>
 
-            <span className="col-span-12 hidden text-right text-[0.72rem] tracking-[0.16em] text-muted uppercase transition-colors duration-300 group-hover:text-paper sm:col-span-1 sm:block lg:col-span-2">
-              Open
-            </span>
-
-            {!desktop ? (
-              <div className="relative col-span-12 mt-4 aspect-[16/10] overflow-hidden bg-void-3 sm:hidden">
+              <div className="relative col-span-12 mt-4 aspect-[16/10] overflow-hidden bg-void-3 md:hidden">
                 <ProjectMedia
-                  media={projectThumb(project)}
+                  media={media}
                   sizes="100vw"
                   priority={index === 0}
                 />
               </div>
-            ) : null}
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-/** @deprecated Prefer WorkIndex for the interactive list */
 export function ProjectList(props: {
   projects: Project[];
   numbered?: boolean;

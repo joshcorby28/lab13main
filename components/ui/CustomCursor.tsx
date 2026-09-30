@@ -110,7 +110,7 @@ export function CustomCursor() {
       }}
     >
       <div
-        className="grid place-items-center rounded-full border border-paper bg-paper text-void"
+        className="grid place-items-center rounded-full border border-paper bg-paper text-[#070707]"
         style={{
           width: size,
           height: size,
@@ -118,7 +118,7 @@ export function CustomCursor() {
         }}
       >
         {state.label ? (
-          <span className="eyebrow text-[0.55rem] tracking-[0.2em] text-void">
+          <span className="eyebrow text-[0.55rem] tracking-[0.2em] text-[#070707]">
             {state.label}
           </span>
         ) : null}
