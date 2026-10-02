@@ -223,6 +223,34 @@ export const projects: Project[] = [
       "Theme work, product presentation and merchandising structure tailored to a direct-to-door protein brand.",
   },
   {
+    slug: "sofa-club",
+    title: "Sofa Club",
+    client: "Sofa Club",
+    industry: "Furniture",
+    summary:
+      "Discover our stylish and luxurious sofas at Sofa Club. Designed for modern living and delivered direct to your door in 24 hours. Explore here.",
+    intro:
+      "Shopify store for Sofa Club — stylish sofas designed for modern living, delivered in 24 hours.",
+    services: ["Shopify development", "Store design", "E-commerce"],
+    technologies: ["Shopify", "Custom theme work", "Product merchandising"],
+    featured: true,
+    category: "shopify",
+    hero: {
+      kind: "image",
+      src: "/images/projects/sofa-club-1.jpg",
+      alt: "Sofa Club campaign imagery",
+    },
+    gallery: [],
+    overview:
+      "Sofa Club sells stylish, luxurious sofas built for modern living — with delivery to your door in 24 hours. We built a Shopify experience that puts the product, the lifestyle, and the speed of delivery front and centre.",
+    challenge:
+      "A furniture brand needed a store that felt as considered as the sofas, while making a fast delivery promise clear and credible.",
+    solution:
+      "A clean Shopify storefront focused on lifestyle imagery, product clarity, and a confident path to purchase.",
+    development:
+      "Theme work, product presentation and merchandising structure tailored to a direct-to-door furniture brand.",
+  },
+  {
     slug: "north-form",
     title: "North Form",
     client: "North Form",

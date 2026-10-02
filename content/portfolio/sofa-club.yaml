@@ -1,0 +1,20 @@
+title: Sofa Club
+client: Sofa Club
+industry: Furniture
+category: shopify
+summary: >-
+  Discover our stylish and luxurious sofas at Sofa Club. Designed for modern
+  living and delivered direct to your door in 24 hours. Explore here.
+result: ""
+services:
+  - Shopify development
+  - Store design
+  - E-commerce
+liveUrl: null
+featured: true
+order: 7
+tone: "#8a7564"
+cardImage: sofa-club-card.jpg
+cardVideo: null
+frames:
+  - sofa-club-1.jpg
