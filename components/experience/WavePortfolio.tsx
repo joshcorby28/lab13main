@@ -544,6 +544,7 @@ export function WavePortfolio({
   const [active, setActive] = useState<number | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [aboutPortrait, setAboutPortrait] = useState<"joshua" | null>(null);
   const [aboutHover, setAboutHover] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [popupScroll, setPopupScroll] = useState(0);
@@ -566,6 +567,11 @@ export function WavePortfolio({
   });
   aboutOpenRef.current = aboutOpen;
   aboutHoverRef.current = aboutHover;
+
+  const closeAbout = () => {
+    setAboutPortrait(null);
+    setAboutOpen(false);
+  };
 
   const switchTrack = (next: PortfolioTrack, event: MouseEvent<HTMLButtonElement>) => {
     if (next === track || transitionRef.current.phase !== "idle" || aboutOpen) return;
@@ -634,7 +640,7 @@ export function WavePortfolio({
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         if (active !== null) setActive(null);
-        else if (aboutOpen) setAboutOpen(false);
+        else if (aboutOpen) closeAbout();
         return;
       }
       if (active === null || projects.length < 2) return;
@@ -1436,7 +1442,10 @@ export function WavePortfolio({
         {!aboutOpen ? (
           <button
             type="button"
-            onClick={() => setAboutOpen(true)}
+            onClick={() => {
+              setAboutPortrait(null);
+              setAboutOpen(true);
+            }}
             className="wave-chrome pointer-events-auto relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
           >
             About
@@ -1482,14 +1491,14 @@ export function WavePortfolio({
               type="button"
               aria-label="Close about"
               className="absolute inset-0 cursor-default bg-transparent"
-              onClick={() => setAboutOpen(false)}
+              onClick={closeAbout}
             />
 
             <button
               ref={aboutCloseRef}
               type="button"
               data-chrome
-              onClick={() => setAboutOpen(false)}
+              onClick={closeAbout}
               className="wave-chrome absolute top-6 right-6 z-40 px-2 py-2 font-normal tracking-[0.22em] uppercase text-white/85 sm:top-8 sm:right-10"
             >
               Close
@@ -1526,28 +1535,112 @@ export function WavePortfolio({
                   }}
                 />
 
-                <div className="relative z-10 flex max-h-[72%] max-w-[min(34rem,68%)] flex-col items-center justify-center px-6 text-center text-white">
+                <AnimatePresence>
+                  {aboutPortrait === "joshua" ? (
+                    <motion.button
+                      key="about-go-back"
+                      type="button"
+                      onClick={() => setAboutPortrait(null)}
+                      className="absolute top-[4%] left-1/2 z-20 -translate-x-1/2 text-[10px] tracking-[0.2em] uppercase text-white/70 transition-colors hover:text-white"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      Go back
+                    </motion.button>
+                  ) : null}
+                </AnimatePresence>
+
+                <div className="relative z-10 flex aspect-square w-[74%] items-center justify-center overflow-hidden rounded-full text-center text-white">
                   <h2 id="about-title" className="sr-only">
                     About
                   </h2>
-                  <p className="max-w-[34ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90">
-                    {studio.about}
-                  </p>
-                  <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[10px] tracking-[0.16em] uppercase text-white/45">
-                    {studio.people.map((person) => (
-                      <span key={person.name}>
-                        {person.name}
-                        <span className="mx-1.5 text-white/20">·</span>
-                        {person.role}
-                      </span>
-                    ))}
-                  </div>
-                  <a
-                    href={`mailto:${site.email}`}
-                    className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
-                  >
-                    Email
-                  </a>
+                  <AnimatePresence mode="wait" initial={false}>
+                    {aboutPortrait === "joshua" ? (
+                      <motion.div
+                        key="joshua-portrait"
+                        className="absolute inset-0 overflow-hidden rounded-full"
+                        initial={{ opacity: 0, scale: 1.04 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <img
+                          src="/images/studio/joshua-corby.jpg"
+                          alt="Joshua Corby"
+                          className="h-full w-full object-cover object-[50%_18%] grayscale"
+                          draggable={false}
+                        />
+                        {/* Soft dissolve into the black aperture so the cutout
+                            feels continuous with the portal, not a hard photo. */}
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0"
+                          style={{
+                            background:
+                              "radial-gradient(circle at 50% 42%, transparent 34%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0.92) 78%, #000 92%)",
+                          }}
+                        />
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0"
+                          style={{
+                            background:
+                              "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)",
+                          }}
+                        />
+                        <span className="pointer-events-none absolute inset-x-0 bottom-[14%] text-[10px] tracking-[0.2em] uppercase text-white/55">
+                          Joshua Corby
+                        </span>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="about-copy"
+                        className="flex max-h-[86%] max-w-[min(34rem,88%)] flex-col items-center justify-center px-6"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <p className="max-w-[34ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90">
+                          {studio.about}
+                        </p>
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[10px] tracking-[0.16em] uppercase text-white/45">
+                          {studio.people.map((person) => {
+                            const isJoshua = person.name === "Joshua Corby";
+                            if (isJoshua) {
+                              return (
+                                <button
+                                  key={person.name}
+                                  type="button"
+                                  onClick={() => setAboutPortrait("joshua")}
+                                  className="text-[10px] tracking-[0.16em] uppercase transition-colors hover:text-white"
+                                >
+                                  {person.name}
+                                  <span className="mx-1.5 text-white/20">·</span>
+                                  {person.role}
+                                </button>
+                              );
+                            }
+                            return (
+                              <span key={person.name}>
+                                {person.name}
+                                <span className="mx-1.5 text-white/20">·</span>
+                                {person.role}
+                              </span>
+                            );
+                          })}
+                        </div>
+                        <a
+                          href={`mailto:${site.email}`}
+                          className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
+                        >
+                          Email
+                        </a>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </motion.div>
