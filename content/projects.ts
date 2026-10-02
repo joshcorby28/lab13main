@@ -83,13 +83,13 @@ export const projects: Project[] = [
     hero: {
       kind: "image",
       src: "/images/projects/project-cosmetics-1.jpg",
-      alt: "Project Cosmetics campaign imagery",
+      alt: "Project Cosmetics lip gloss campaign",
     },
     gallery: [
       {
         kind: "image",
         src: "/images/projects/project-cosmetics-2.jpg",
-        alt: "Project Cosmetics product still",
+        alt: "Project Cosmetics lip gloss campaign",
       },
     ],
     overview:
@@ -176,7 +176,11 @@ export const projects: Project[] = [
     liveUrl: "https://studio163.de/",
     featured: true,
     category: "shopify",
-    hero: { kind: "field", tone: "cashmere", label: "Studio 163" },
+    hero: {
+      kind: "image",
+      src: "/images/projects/studio-163-1.jpg",
+      alt: "Studio 163 campaign portrait",
+    },
     gallery: [],
     overview:
       "The client sought to completely revamp their outdated website, aiming to create a more modern and user-friendly experience. The objectives were to enhance user satisfaction through a visually appealing design and intuitive navigation while aligning with current luxury fashion trends.",
@@ -189,6 +193,34 @@ export const projects: Project[] = [
     results: [
       "Improved user engagement and conversion rates following the rebuild.",
     ],
+  },
+  {
+    slug: "fit-n-fresh",
+    title: "Fit N Fresh",
+    client: "Fit N Fresh",
+    industry: "Protein & wellness",
+    summary:
+      "Fit N Fresh offer handmade and tastiest ideal protein bars with low-calorie and high-protein to meet various dietary needs. Delivered right to your door.",
+    intro:
+      "Shopify store for Fit N Fresh — handmade high-protein, low-calorie bars delivered to your door.",
+    services: ["Shopify development", "Store design", "E-commerce"],
+    technologies: ["Shopify", "Custom theme work", "Product merchandising"],
+    featured: true,
+    category: "shopify",
+    hero: {
+      kind: "image",
+      src: "/images/projects/fit-n-fresh-1.jpg",
+      alt: "Fit N Fresh campaign imagery",
+    },
+    gallery: [],
+    overview:
+      "Fit N Fresh make handmade protein bars built for real dietary needs — high protein, low calorie, and delivered straight to the door. We built a Shopify experience that puts the product and the promise front and centre.",
+    challenge:
+      "A growing food brand needed a store that felt as fresh as the product, with a clear path from discovery to subscription-style repeat buying.",
+    solution:
+      "A clean Shopify storefront focused on the bars, dietary messaging, and a simple, confident checkout journey.",
+    development:
+      "Theme work, product presentation and merchandising structure tailored to a direct-to-door protein brand.",
   },
   {
     slug: "north-form",

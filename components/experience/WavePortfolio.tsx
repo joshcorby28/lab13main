@@ -542,7 +542,6 @@ export function WavePortfolio({
   const [track, setTrack] = useState<PortfolioTrack>("shopify");
   const projects = track === "shopify" ? shopifyProjects : brandingProjects;
   const [active, setActive] = useState<number | null>(null);
-  const [hovered, setHovered] = useState<number | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [aboutPortrait, setAboutPortrait] = useState<"joshua" | null>(null);
   const [aboutHover, setAboutHover] = useState(false);
@@ -577,7 +576,6 @@ export function WavePortfolio({
     if (next === track || transitionRef.current.phase !== "idle" || aboutOpen) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setActive(null);
-    setHovered(null);
     if (reduce) {
       setTrack(next);
       return;
@@ -986,19 +984,56 @@ export function WavePortfolio({
     };
     resize();
 
+    const cardMeshes = cards.map((card) => card.mesh);
+    let pendingPointer: PointerEvent | null = null;
+    let pickRaf = 0;
+
     const pick = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(pointer, camera);
-      const hits = raycaster.intersectObjects(cards.map((card) => card.mesh));
+      const hits = raycaster.intersectObjects(cardMeshes);
       return hits[0] ?? null;
+    };
+
+    const syncCursorLabel = (index: number | null) => {
+      if (index === null || openRef.current !== null || aboutOpenRef.current) {
+        canvas.removeAttribute("data-cursor");
+      } else {
+        canvas.setAttribute("data-cursor", "Open");
+      }
     };
 
     const isChromeTarget = (event: Event) =>
       Boolean((event.target as HTMLElement | null)?.closest("[data-chrome], a, button, [data-about-dialog], [data-project-dialog]"));
 
     const blocked = () => openRef.current !== null || aboutOpenRef.current;
+
+    const applyHoverPick = (event: PointerEvent) => {
+      if (blocked()) return;
+      if (isChromeTarget(event)) {
+        if (hoverRef.current !== null) {
+          hoverRef.current = null;
+          syncCursorLabel(null);
+        }
+        return;
+      }
+      const hit = pick(event);
+      const index = hit ? (hit.object.userData.index as number) : null;
+      if (hit?.uv && index !== null) {
+        const card = cards[index];
+        card.pointerTarget.copy(hit.uv);
+        if (index !== hoverRef.current) {
+          card.uniforms.uPointer.value.copy(hit.uv);
+          card.uniforms.uRippleTime.value = 0;
+        }
+      }
+      if (index !== hoverRef.current) {
+        hoverRef.current = index;
+        syncCursorLabel(index);
+      }
+    };
 
     const onPointerDown = (event: PointerEvent) => {
       if (blocked() || isChromeTarget(event)) return;
@@ -1017,27 +1052,13 @@ export function WavePortfolio({
         lastX = event.clientX;
         return;
       }
-      if (isChromeTarget(event)) {
-        if (hoverRef.current !== null) {
-          hoverRef.current = null;
-          setHovered(null);
-        }
-        return;
-      }
-      const hit = pick(event);
-      const index = hit ? (hit.object.userData.index as number) : null;
-      if (hit?.uv && index !== null) {
-        const card = cards[index];
-        card.pointerTarget.copy(hit.uv);
-        if (index !== hoverRef.current) {
-          card.uniforms.uPointer.value.copy(hit.uv);
-          card.uniforms.uRippleTime.value = 0;
-        }
-      }
-      if (index !== hoverRef.current) {
-        hoverRef.current = index;
-        setHovered(index);
-      }
+      pendingPointer = event;
+      if (pickRaf) return;
+      pickRaf = requestAnimationFrame(() => {
+        pickRaf = 0;
+        if (pendingPointer) applyHoverPick(pendingPointer);
+        pendingPointer = null;
+      });
     };
     const onPointerUp = (event: PointerEvent) => {
       if (!dragging) return;
@@ -1124,39 +1145,42 @@ export function WavePortfolio({
       portalGroup.rotation.x = Math.sin(nowMs * 0.00032) * 0.012 * portalEase - closePulse * 0.035;
       portalGroup.rotation.y = closePulse * 0.045;
 
-      // Animate the liquid-metal surface without rebuilding the geometry.
       const now = performance.now() * 0.001;
-      for (let i = 0; i < portalDisplacement.count; i += 1) {
-        const ix = i * 3;
-        const bx = portalBasePositions[ix];
-        const by = portalBasePositions[ix + 1];
-        const bz = portalBasePositions[ix + 2];
-        const radial = Math.sqrt(bx * bx + by * by);
-        const pulse =
-          Math.sin(Math.atan2(by, bx) * 7.0 + now * 0.9) * 0.035 +
-          Math.sin(radial * 15.0 - now * 1.35) * 0.018;
-        const closeWarp = closePulse * (0.35 + 0.65 * (1 - aboutAmt));
-        const scale = 1 + pulse * portalEase + closeWarp * Math.sin(Math.atan2(by, bx) * 3.0);
-        portalDisplacement.array[ix] = bx * scale;
-        portalDisplacement.array[ix + 1] = by * scale;
-        portalDisplacement.array[ix + 2] = bz + pulse * 0.55 * portalEase + closeWarp * 0.12;
-      }
-      portalDisplacement.needsUpdate = true;
 
-      const highlightPositions = torusHighlight.geometry.attributes.position;
-      for (let i = 0; i < highlightPositions.count; i += 1) {
-        const ix = i * 3;
-        const bx = portalBaseHighlight[ix];
-        const by = portalBaseHighlight[ix + 1];
-        const bz = portalBaseHighlight[ix + 2];
-        const angle = Math.atan2(by, bx);
-        const shimmer = Math.sin(angle * 5.0 - now * 1.15) * 0.025 * portalEase;
-        const closeShimmer = closePulse * 0.035 * Math.sin(angle * 2.0);
-        highlightPositions.array[ix] = bx * (1 + shimmer + closeShimmer);
-        highlightPositions.array[ix + 1] = by * (1 + shimmer + closeShimmer);
-        highlightPositions.array[ix + 2] = bz + shimmer * 0.5 + closePulse * 0.06;
+      // Only deform the chrome ring while About is open — this mesh is dense.
+      if (aboutAmt > 0.0005) {
+        for (let i = 0; i < portalDisplacement.count; i += 1) {
+          const ix = i * 3;
+          const bx = portalBasePositions[ix];
+          const by = portalBasePositions[ix + 1];
+          const bz = portalBasePositions[ix + 2];
+          const radial = Math.sqrt(bx * bx + by * by);
+          const pulse =
+            Math.sin(Math.atan2(by, bx) * 7.0 + now * 0.9) * 0.035 +
+            Math.sin(radial * 15.0 - now * 1.35) * 0.018;
+          const closeWarp = closePulse * (0.35 + 0.65 * (1 - aboutAmt));
+          const scale = 1 + pulse * portalEase + closeWarp * Math.sin(Math.atan2(by, bx) * 3.0);
+          portalDisplacement.array[ix] = bx * scale;
+          portalDisplacement.array[ix + 1] = by * scale;
+          portalDisplacement.array[ix + 2] = bz + pulse * 0.55 * portalEase + closeWarp * 0.12;
+        }
+        portalDisplacement.needsUpdate = true;
+
+        const highlightPositions = torusHighlight.geometry.attributes.position;
+        for (let i = 0; i < highlightPositions.count; i += 1) {
+          const ix = i * 3;
+          const bx = portalBaseHighlight[ix];
+          const by = portalBaseHighlight[ix + 1];
+          const bz = portalBaseHighlight[ix + 2];
+          const angle = Math.atan2(by, bx);
+          const shimmer = Math.sin(angle * 5.0 - now * 1.15) * 0.025 * portalEase;
+          const closeShimmer = closePulse * 0.035 * Math.sin(angle * 2.0);
+          highlightPositions.array[ix] = bx * (1 + shimmer + closeShimmer);
+          highlightPositions.array[ix + 1] = by * (1 + shimmer + closeShimmer);
+          highlightPositions.array[ix + 2] = bz + shimmer * 0.5 + closePulse * 0.06;
+        }
+        highlightPositions.needsUpdate = true;
       }
-      highlightPositions.needsUpdate = true;
 
       const hoverMetal = aboutHoverRef.current ? 1 : 0;
       torusMaterial.roughness = 0.16 - hoverMetal * 0.07;
@@ -1252,6 +1276,7 @@ export function WavePortfolio({
     return () => {
       alive = false;
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(pickRaf);
       canvas.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
@@ -1381,7 +1406,7 @@ export function WavePortfolio({
                             <img
                               src="/images/brands/shopify-plus.png"
                               alt="Shopify Plus"
-                              className="h-2.5 w-auto"
+                              className="block h-2.5! w-auto! max-h-2.5 max-w-[3.25rem]"
                             />
                           </span>
                         ) : null}
@@ -1409,7 +1434,6 @@ export function WavePortfolio({
                   ? "wave-track-in"
                   : "scale-100 opacity-100 blur-0 brightness-100"
             }`}
-            data-cursor={hovered === null || overlayOpen ? undefined : "Open"}
             aria-label="Selected Lab 13 work"
           />
           <div
@@ -1748,95 +1772,117 @@ export function WavePortfolio({
                   };
                   window.addEventListener("pointerup", onUp);
                 }}
-                className="relative z-10 mx-[3.35rem] flex h-full flex-col overflow-visible text-[#111] sm:mx-[3.75rem] md:mx-[4.25rem] md:flex-row"
+                className="relative z-10 mx-[3.35rem] h-full overflow-visible text-[#111] sm:mx-[3.75rem] md:mx-[4.25rem]"
                 initial={{ x: 28, opacity: 0.85, scale: 0.985 }}
                 animate={{ x: 0, opacity: 1, scale: 1 }}
                 exit={{ x: -28, opacity: 0.85, scale: 0.985 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                <svg
-                  className="pointer-events-none absolute inset-0 h-full w-full overflow-visible drop-shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
-                  viewBox="0 0 1 1"
-                  preserveAspectRatio="none"
-                  aria-hidden
-                >
-                  <defs>
-                    <clipPath id={`project-bulge-clip-${projectBulgeId}`} clipPathUnits="objectBoundingBox">
-                      <path d={popupBulgePath} />
-                    </clipPath>
-                  </defs>
-                  <path d={popupBulgePath} fill="#ffffff" />
-                </svg>
-
-                <div
-                  className="relative z-10 flex min-h-0 w-full flex-1 flex-col md:flex-row"
-                  style={{ clipPath: `url(#project-bulge-clip-${projectBulgeId})` }}
-                >
-                  <div className="hide-scrollbar flex shrink-0 flex-col px-7 pt-10 pb-8 sm:px-10 md:w-[34%] md:overflow-y-auto md:px-12 md:pt-14">
-                    <h2 id="project-title" className="display text-[clamp(2.5rem,4.4vw,4.3rem)]">
-                      {project.title}
-                    </h2>
-                    <p className="mt-6 max-w-[36ch] text-[15px] leading-relaxed text-black/70">{project.summary}</p>
-                    {project.result ? (
-                      <p className="mt-5 max-w-[36ch] text-[14px] leading-relaxed text-black/50">{project.result}</p>
-                    ) : null}
-                    <div className="mt-8 flex flex-wrap items-center gap-2">
-                      <a
-                        href={project.liveUrl ?? `/work/${project.slug}`}
-                        target={project.liveUrl ? "_blank" : undefined}
-                        rel={project.liveUrl ? "noreferrer" : undefined}
-                        className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
-                        aria-label={project.liveUrl ? `Visit ${project.title}` : `Open ${project.title} case study`}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-                          <path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.4" />
-                        </svg>
-                      </a>
-                      {[project.client, project.industry, project.services[0]].filter(Boolean).map((pill) => (
-                        <span
-                          key={pill}
-                          className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
-                        >
-                          {pill}
-                        </span>
-                      ))}
-                    </div>
-                    <Link
-                      href={`/work/${project.slug}`}
-                      className="mt-8 text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
-                    >
-                      Case study
-                    </Link>
-                  </div>
+                <div className="relative flex h-full flex-col md:flex-row">
+                  <svg
+                    className="pointer-events-none absolute inset-0 h-full w-full overflow-visible drop-shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
+                    viewBox="0 0 1 1"
+                    preserveAspectRatio="none"
+                    aria-hidden
+                  >
+                    <defs>
+                      <clipPath id={`project-bulge-clip-${projectBulgeId}`} clipPathUnits="objectBoundingBox">
+                        <path d={popupBulgePath} />
+                      </clipPath>
+                    </defs>
+                    <path d={popupBulgePath} fill="#ffffff" />
+                  </svg>
 
                   <div
-                    data-gallery
-                    className="hide-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:px-5 md:pt-5 md:pb-5"
-                    onScroll={(event) => {
-                      const el = event.currentTarget;
-                      const max = Math.max(el.scrollHeight - el.clientHeight, 1);
-                      setPopupScroll(Math.min(1, Math.max(0, el.scrollTop / max)));
-                    }}
+                    className="relative z-10 flex min-h-0 w-full flex-1 flex-col md:flex-row"
+                    style={{ clipPath: `url(#project-bulge-clip-${projectBulgeId})` }}
                   >
-                    <div className="flex flex-col gap-4 md:gap-5">
-                      {project.frames.map((src) => (
-                        <RippleFrame key={src} src={src} />
-                      ))}
+                    <div className="hide-scrollbar flex shrink-0 flex-col px-7 pt-10 pb-8 sm:px-10 md:w-[34%] md:overflow-y-auto md:px-12 md:pt-14">
+                      <h2 id="project-title" className="display text-[clamp(2.5rem,4.4vw,4.3rem)]">
+                        {project.title}
+                      </h2>
+                      <p className="mt-6 max-w-[36ch] text-[15px] leading-relaxed text-black/70">
+                        {project.summary}
+                      </p>
+                      {project.result ? (
+                        <p className="mt-5 max-w-[36ch] text-[14px] leading-relaxed text-black/50">
+                          {project.result}
+                        </p>
+                      ) : null}
+                      <div className="mt-8 flex flex-wrap items-center gap-2">
+                        <a
+                          href={project.liveUrl ?? `/work/${project.slug}`}
+                          target={project.liveUrl ? "_blank" : undefined}
+                          rel={project.liveUrl ? "noreferrer" : undefined}
+                          className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
+                          aria-label={
+                            project.liveUrl
+                              ? `Visit ${project.title}`
+                              : `Open ${project.title} case study`
+                          }
+                        >
+                          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                            <path
+                              d="M2 7h10M8 3l4 4-4 4"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.4"
+                            />
+                          </svg>
+                        </a>
+                        {[project.client, project.industry, project.services[0]]
+                          .filter(Boolean)
+                          .map((pill) => (
+                            <span
+                              key={pill}
+                              className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
+                            >
+                              {pill}
+                            </span>
+                          ))}
+                      </div>
+                      <Link
+                        href={`/work/${project.slug}`}
+                        className="mt-8 text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
+                      >
+                        Case study
+                      </Link>
+                    </div>
+
+                    <div
+                      data-gallery
+                      className="hide-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:px-5 md:pt-5 md:pb-5"
+                      onScroll={(event) => {
+                        const el = event.currentTarget;
+                        const max = Math.max(el.scrollHeight - el.clientHeight, 1);
+                        setPopupScroll(Math.min(1, Math.max(0, el.scrollTop / max)));
+                      }}
+                    >
+                      <div className="flex flex-col gap-4 md:gap-5">
+                        {project.frames.map((src) => (
+                          <RippleFrame key={src} src={src} />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  ref={closeRef}
-                  type="button"
-                  aria-label="Close"
-                  onClick={() => setActive(null)}
-                  className="absolute top-4 right-4 z-30 grid h-11 w-11 place-items-center rounded-full bg-black text-white"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-                    <path d="M1 1l12 12M13 1L1 13" fill="none" stroke="currentColor" strokeWidth="1.4" />
-                  </svg>
-                </button>
+                  <button
+                    ref={closeRef}
+                    type="button"
+                    aria-label="Close"
+                    onClick={() => setActive(null)}
+                    className="absolute top-4 right-4 z-30 grid h-11 w-11 place-items-center rounded-full bg-black text-white"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                      <path
+                        d="M1 1l12 12M13 1L1 13"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </motion.div>
 
               {nextProject && nextIndex !== null && projects.length > 1 ? (

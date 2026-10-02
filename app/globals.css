@@ -262,6 +262,22 @@ video {
   }
 }
 
+.cursor-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  opacity: 0.9;
+  transition:
+    width 180ms ease,
+    height 180ms ease,
+    opacity 180ms ease;
+}
+
+[data-label="1"] .cursor-dot {
+  width: 4rem;
+  height: 4rem;
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
