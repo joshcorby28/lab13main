@@ -2,6 +2,8 @@ export type Media =
   | { kind: "image"; src: string; alt: string }
   | { kind: "field"; tone: "moss" | "steel" | "cashmere" | "ink" | "sand"; label: string };
 
+export type ProjectCategory = "shopify" | "branding"
+
 export type Project = {
   slug: string
   title: string
@@ -13,6 +15,7 @@ export type Project = {
   technologies: string[]
   liveUrl?: string
   featured: boolean
+  category: ProjectCategory
   hero: Media
   gallery: Media[]
   overview: string
@@ -37,6 +40,7 @@ export const projects: Project[] = [
     technologies: ["Shopify Plus", "Liquid", "Custom sections", "Collection merchandising"],
     liveUrl: "https://hyloathletics.com/",
     featured: true,
+    category: "shopify",
     hero: {
       kind: "image",
       src: "/images/projects/hylo-2.jpg",
@@ -73,8 +77,9 @@ export const projects: Project[] = [
       "Full migration from WooCommerce to Shopify for Project Cosmetics.",
     services: ["Shopify migration", "Subscriptions", "Shopify development"],
     technologies: ["Shopify", "Subscriptions", "Customer data migration", "Product catalogue"],
-    liveUrl: "https://www.projectplump.com/",
+    liveUrl: "https://www.projectlip.com/",
     featured: true,
+    category: "shopify",
     hero: {
       kind: "image",
       src: "/images/projects/project-cosmetics-1.jpg",
@@ -112,6 +117,7 @@ export const projects: Project[] = [
     technologies: ["Shopify", "Prestige theme", "Custom features", "Theme development"],
     liveUrl: "https://www.amylynn.co.uk/",
     featured: true,
+    category: "shopify",
     hero: {
       kind: "image",
       src: "/images/projects/amy-lynn-1.jpg",
@@ -145,6 +151,7 @@ export const projects: Project[] = [
     technologies: ["Shopify", "Custom product customiser", "Frontend development"],
     liveUrl: "https://maeving.com/",
     featured: true,
+    category: "shopify",
     hero: { kind: "field", tone: "steel", label: "Maeving" },
     gallery: [],
     overview:
@@ -168,6 +175,7 @@ export const projects: Project[] = [
     technologies: ["Shopify Plus", "Custom theme work", "Navigation & merchandising"],
     liveUrl: "https://studio163.de/",
     featured: true,
+    category: "shopify",
     hero: { kind: "field", tone: "cashmere", label: "Studio 163" },
     gallery: [],
     overview:
@@ -182,16 +190,94 @@ export const projects: Project[] = [
       "Improved user engagement and conversion rates following the rebuild.",
     ],
   },
+  {
+    slug: "north-form",
+    title: "North Form",
+    client: "North Form",
+    industry: "Brand identity",
+    summary:
+      "A full visual identity for a contemporary product studio — wordmark, type system, colour and brand applications.",
+    intro: "Brand identity and art direction for North Form.",
+    services: ["Brand identity", "Art direction", "Guidelines"],
+    technologies: ["Identity", "Typography", "Brand guidelines"],
+    featured: true,
+    category: "branding",
+    hero: { kind: "field", tone: "ink", label: "North Form" },
+    gallery: [],
+    overview:
+      "We built a clear, flexible identity system that works across packaging, digital and print touchpoints.",
+    challenge:
+      "A young studio needed a mark and system that felt established without looking generic.",
+    solution:
+      "A restrained identity built around a distinctive wordmark, a tight type pairing, and a palette that holds up in both print and screen.",
+    development:
+      "Deliverables included the core mark, type and colour rules, plus a short guideline set for everyday use.",
+  },
+  {
+    slug: "harbour-goods",
+    title: "Harbour Goods",
+    client: "Harbour Goods",
+    industry: "Packaging & brand",
+    summary:
+      "Packaging and brand design for a lifestyle goods label — tactile print systems with a calm, coastal tone.",
+    intro: "Packaging and brand systems for Harbour Goods.",
+    services: ["Packaging", "Brand design", "Print"],
+    technologies: ["Packaging", "Print design", "Visual system"],
+    featured: true,
+    category: "branding",
+    hero: { kind: "field", tone: "steel", label: "Harbour Goods" },
+    gallery: [],
+    overview:
+      "We designed packaging and supporting brand assets that feel premium on shelf and consistent online.",
+    challenge:
+      "The product range needed a unified look without losing the character of individual lines.",
+    solution:
+      "A modular packaging system with shared structure, type and colour — flexible enough for new SKUs.",
+    development:
+      "Print-ready artwork, dielines and a simple brand kit for future packaging updates.",
+  },
+  {
+    slug: "signal-studio",
+    title: "Signal Studio",
+    client: "Signal Studio",
+    industry: "Visual identity",
+    summary:
+      "A sharp visual identity and social system for a creative studio — built to move across campaigns and channels.",
+    intro: "Visual identity and social design for Signal Studio.",
+    services: ["Visual identity", "Social design", "Art direction"],
+    technologies: ["Identity", "Social templates", "Campaign design"],
+    featured: true,
+    category: "branding",
+    hero: { kind: "field", tone: "moss", label: "Signal Studio" },
+    gallery: [],
+    overview:
+      "We created an identity and template system that keeps Signal looking distinct across every channel.",
+    challenge:
+      "Fast-moving social and campaign work needed a system that stayed consistent under pressure.",
+    solution:
+      "A bold mark, layout rules and reusable templates that the team can apply without losing quality.",
+    development:
+      "Core identity, social templates and a lightweight brand guide for day-to-day production.",
+  },
 ]
 
 export function getProject(slug: string) {
   return projects.find((project) => project.slug === slug)
 }
 
-export function getFeaturedProjects() {
-  return projects.filter((project) => project.featured)
+export function getFeaturedProjects(category?: ProjectCategory) {
+  return projects.filter(
+    (project) => project.featured && (!category || project.category === category),
+  )
 }
 
 export function getRelatedProjects(slug: string, limit = 2) {
-  return projects.filter((project) => project.slug !== slug).slice(0, limit)
+  const current = getProject(slug)
+  return projects
+    .filter(
+      (project) =>
+        project.slug !== slug &&
+        (!current || project.category === current.category),
+    )
+    .slice(0, limit)
 }

@@ -1,0 +1,21 @@
+title: Project Cosmetics
+client: Project Cosmetics
+industry: Beauty
+category: shopify
+summary: >-
+  Full WooCommerce to Shopify migration — products, customers and subscriptions —
+  followed by a store experience that doubled conversion rate.
+result: 100% increase in conversion rates after moving to Shopify.
+services:
+  - Shopify migration
+  - Subscriptions
+  - Shopify development
+liveUrl: https://www.projectlip.com/
+featured: true
+order: 2
+tone: "#161614"
+cardImage: project-cosmetics-card.jpg
+cardVideo: null
+frames:
+  - project-cosmetics-1.jpg
+  - project-cosmetics-2.jpg

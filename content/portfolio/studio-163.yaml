@@ -1,0 +1,20 @@
+title: Studio 163
+client: Studio 163
+industry: Cashmere knitwear
+category: shopify
+summary: >-
+  A complete Shopify Plus rebuild for a cashmere knitwear brand —
+  from an outdated site to a cleaner, more modern store built for luxury retail.
+result: Improved user engagement and conversion rates following the rebuild.
+services:
+  - Shopify Plus
+  - Store rebuild
+  - UX
+liveUrl: https://studio163.de/
+featured: true
+order: 5
+tone: "#c2b39f"
+cardImage: studio-163-card.jpg
+cardVideo: null
+frames:
+  - studio-163-full.jpg

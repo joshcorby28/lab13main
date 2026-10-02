@@ -5,7 +5,7 @@ export const studio = {
   positioning:
     "Thoughtfully crafted Shopify Plus stores & apps.",
   about:
-    "We're a small but powerful team, specialising in Shopify and brand development, delivering impactful results with precision and creativity.",
+    "Lab13 is a family-run web design studio based in Exeter, UK, that specializes in Shopify Plus stores, custom apps, and digital branding.",
   story:
     "We are a family-run studio, founded and operated by two brothers, specialising in Shopify Plus and brand development. With over 18 years of combined experience, we work with brands around the globe.",
   mission:

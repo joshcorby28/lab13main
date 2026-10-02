@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Serif, Inter_Tight } from "next/font/google";
 import { Header } from "@/components/navigation/Header";
+import { RouteChrome } from "@/components/navigation/RouteChrome";
 import { Footer } from "@/components/footer/Footer";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { organizationJsonLd } from "@/lib/seo";
@@ -85,9 +86,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <CustomCursor />
-        <Header />
+        <RouteChrome>
+          <Header />
+        </RouteChrome>
         <main id="main">{children}</main>
-        <Footer />
+        <RouteChrome>
+          <Footer />
+        </RouteChrome>
       </body>
     </html>
   );

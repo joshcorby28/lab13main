@@ -1,0 +1,20 @@
+title: Maeving
+client: Maeving
+industry: Electric motorcycles
+category: shopify
+summary: >-
+  Ongoing Shopify development for Maeving — new features, issue resolution,
+  and care for the bike customiser that lets customers build their own electric bike.
+result: ""
+services:
+  - Shopify development
+  - Custom functionality
+  - Retainer
+liveUrl: https://maeving.com/
+featured: true
+order: 4
+tone: "#243038"
+cardImage: maeving-card.jpg
+cardVideo: maeving.mp4
+frames:
+  - maeving-full.jpg

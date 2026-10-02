@@ -1,0 +1,20 @@
+title: Amy Lynn
+client: Amy Lynn
+industry: Luxury womenswear
+category: shopify
+summary: >-
+  A new Shopify storefront on Prestige for the luxury fashion designer —
+  custom theme work built to convert, with a measurable lift after launch.
+result: Total sales increased by 60%.
+services:
+  - Shopify development
+  - Custom theme
+  - Conversion
+liveUrl: https://www.amylynn.co.uk/
+featured: true
+order: 3
+tone: "#b7a898"
+cardImage: amy-lynn-card.jpg
+cardVideo: null
+frames:
+  - amy-lynn-1.jpg
