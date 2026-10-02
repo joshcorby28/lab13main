@@ -311,6 +311,7 @@ function RippleFrame({ src }: { src: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const [webglReady, setWebglReady] = useState(false);
   const stateRef = useRef({
     hover: 0,
     hoverGoal: 0,
@@ -416,8 +417,12 @@ function RippleFrame({ src }: { src: string }) {
     const paintAndUpload = () => {
       if (!img.naturalWidth) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.max(1, Math.round(wrap.clientWidth * dpr));
-      const height = Math.max(1, Math.round(wrap.clientHeight * dpr));
+      const cssW = wrap.clientWidth;
+      const cssH = wrap.clientHeight;
+      // Wait until layout has a real size — otherwise the texture stays blank.
+      if (cssW < 2 || cssH < 2) return;
+      const width = Math.max(1, Math.round(cssW * dpr));
+      const height = Math.max(1, Math.round(cssH * dpr));
       if (width !== lastW || height !== lastH || !ready) {
         lastW = width;
         lastH = height;
@@ -432,7 +437,10 @@ function RippleFrame({ src }: { src: string }) {
         gl.viewport(0, 0, width, height);
       }
       gl.uniform1f(uAspect, width / Math.max(height, 1));
-      ready = true;
+      if (!ready) {
+        ready = true;
+        setWebglReady(true);
+      }
     };
 
     if (img.complete && img.naturalWidth) paintAndUpload();
@@ -473,6 +481,7 @@ function RippleFrame({ src }: { src: string }) {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", onResize);
       img.onload = null;
+      setWebglReady(false);
       gl.deleteTexture(texture);
       gl.deleteBuffer(posBuffer);
       gl.deleteBuffer(uvBuffer);
@@ -486,7 +495,7 @@ function RippleFrame({ src }: { src: string }) {
   return (
     <div
       ref={wrapRef}
-      className="relative"
+      className="relative overflow-hidden rounded-[18px]"
       onPointerEnter={() => {
         stateRef.current.hoverGoal = 1;
         stateRef.current.time = 0;
@@ -500,8 +509,19 @@ function RippleFrame({ src }: { src: string }) {
         stateRef.current.pointerGoal.y = (event.clientY - rect.top) / Math.max(rect.height, 1);
       }}
     >
-      <img ref={imgRef} src={src} alt="" className="block w-full opacity-0" draggable={false} />
-      <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+      <img
+        ref={imgRef}
+        src={src}
+        alt=""
+        className={`block w-full transition-opacity duration-200 ${webglReady ? "opacity-0" : "opacity-100"}`}
+        draggable={false}
+      />
+      <canvas
+        ref={canvasRef}
+        className={`pointer-events-none absolute inset-0 h-full w-full transition-opacity duration-200 ${
+          webglReady ? "opacity-100" : "opacity-0"
+        }`}
+      />
     </div>
   );
 }
