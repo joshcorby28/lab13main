@@ -741,6 +741,38 @@ export function WavePortfolio({
     const portalAmbient = new THREE.AmbientLight(0xffffff, 0.22);
     scene.add(portalAmbient);
 
+    // Subtle liquid-metal stage behind the whole experience — same material
+    // language as the About ring, kept quiet so the ribbon still leads.
+    const metalBackdrop = new THREE.Mesh(
+      new THREE.SphereGeometry(22, 72, 48),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xb8a99d,
+        metalness: 1,
+        roughness: 0.42,
+        clearcoat: 0.55,
+        clearcoatRoughness: 0.28,
+        side: THREE.BackSide,
+      }),
+    );
+    metalBackdrop.position.set(0, 0.2, -1.5);
+    metalBackdrop.renderOrder = -10;
+    scene.add(metalBackdrop);
+
+    const metalLightWarm = new THREE.PointLight(0xffd49a, 3.4, 48, 2);
+    metalLightWarm.position.set(-9, 4.5, 3);
+    scene.add(metalLightWarm);
+    const metalLightCool = new THREE.PointLight(0x8fa8ff, 2.2, 48, 2);
+    metalLightCool.position.set(8.5, -3.8, 2.5);
+    scene.add(metalLightCool);
+    const metalLightFill = new THREE.PointLight(0xffffff, 1.1, 42, 2);
+    metalLightFill.position.set(0.5, 7, 5);
+    scene.add(metalLightFill);
+    const metalAmbient = new THREE.AmbientLight(0x2a241f, 0.55);
+    scene.add(metalAmbient);
+
+    renderer.setClearColor(0x0a0908, 1);
+    scene.background = new THREE.Color(0x0a0908);
+
     const portalDisplacement = torusGeometry.attributes.position;
     const portalBasePositions = new Float32Array(portalDisplacement.array as ArrayLike<number>);
     const portalBaseHighlight = new Float32Array(torusHighlight.geometry.attributes.position.array as ArrayLike<number>);
@@ -1135,6 +1167,15 @@ export function WavePortfolio({
       portalLightWhite.intensity = 7 * portalEase;
       portalBack.material.opacity = 0.98 * portalEase;
 
+      // Slow drift on the stage lights so the metal sheen feels alive.
+      metalLightWarm.position.x = -9 + Math.sin(now * 0.18) * 2.4;
+      metalLightWarm.position.y = 4.5 + Math.cos(now * 0.14) * 1.2;
+      metalLightCool.position.x = 8.5 + Math.cos(now * 0.16) * 2.1;
+      metalLightCool.position.y = -3.8 + Math.sin(now * 0.12) * 1.4;
+      metalLightFill.position.x = 0.5 + Math.sin(now * 0.1) * 1.6;
+      metalBackdrop.rotation.y = now * 0.012;
+      metalBackdrop.rotation.x = Math.sin(now * 0.07) * 0.04;
+
       // Track swap ripple: wash out the current ribbon, swap projects at the
       // peak, then wash the new ribbon back in.
       const transition = transitionRef.current;
@@ -1223,6 +1264,8 @@ export function WavePortfolio({
       (torusHighlight.material as THREE.Material).dispose();
       portalBack.geometry.dispose();
       (portalBack.material as THREE.Material).dispose();
+      metalBackdrop.geometry.dispose();
+      (metalBackdrop.material as THREE.Material).dispose();
       videos.forEach((video) => {
         video.pause();
         video.removeAttribute("src");
@@ -1284,7 +1327,14 @@ export function WavePortfolio({
   const popupBulgePath = bulgePanelPath(popupBulge);
 
   return (
-    <div ref={rootRef} className="relative h-[100dvh] w-full overflow-hidden bg-black text-white">
+    <div
+      ref={rootRef}
+      className="relative h-[100dvh] w-full overflow-hidden text-white"
+      style={{
+        background:
+          "radial-gradient(ellipse 90% 70% at 20% 15%, rgba(184,169,157,0.14), transparent 55%), radial-gradient(ellipse 80% 60% at 85% 80%, rgba(143,168,255,0.08), transparent 50%), #0a0908",
+      }}
+    >
       {mobile ? (
         <>
           <div
@@ -1363,13 +1413,13 @@ export function WavePortfolio({
             aria-label="Selected Lab 13 work"
           />
           <div
-            className={`pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.45)_100%)] transition-opacity duration-700 ${aboutOpen ? "opacity-30" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(10,9,8,0.28)_100%)] transition-opacity duration-700 ${aboutOpen ? "opacity-20" : "opacity-100"}`}
           />
           <div
-            className={`pointer-events-none absolute inset-y-0 left-0 z-[2] w-[18%] bg-gradient-to-r from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-y-0 left-0 z-[2] w-[14%] bg-gradient-to-r from-[#0a0908]/80 via-[#0a0908]/35 to-transparent transition-opacity duration-700 sm:w-[18%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
           />
           <div
-            className={`pointer-events-none absolute inset-y-0 right-0 z-[2] w-[18%] bg-gradient-to-l from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-y-0 right-0 z-[2] w-[14%] bg-gradient-to-l from-[#0a0908]/80 via-[#0a0908]/35 to-transparent transition-opacity duration-700 sm:w-[18%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
           />
         </>
       )}
