@@ -1413,13 +1413,13 @@ export function WavePortfolio({
             aria-label="Selected Lab 13 work"
           />
           <div
-            className={`pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(10,9,8,0.28)_100%)] transition-opacity duration-700 ${aboutOpen ? "opacity-20" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.45)_100%)] transition-opacity duration-700 ${aboutOpen ? "opacity-30" : "opacity-100"}`}
           />
           <div
-            className={`pointer-events-none absolute inset-y-0 left-0 z-[2] w-[14%] bg-gradient-to-r from-[#0a0908]/80 via-[#0a0908]/35 to-transparent transition-opacity duration-700 sm:w-[18%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-y-0 left-0 z-[2] w-[18%] bg-gradient-to-r from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
           />
           <div
-            className={`pointer-events-none absolute inset-y-0 right-0 z-[2] w-[14%] bg-gradient-to-l from-[#0a0908]/80 via-[#0a0908]/35 to-transparent transition-opacity duration-700 sm:w-[18%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-y-0 right-0 z-[2] w-[18%] bg-gradient-to-l from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
           />
         </>
       )}
