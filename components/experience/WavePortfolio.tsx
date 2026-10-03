@@ -1475,7 +1475,9 @@ export function WavePortfolio({
 
       <div
         data-chrome
-        className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between px-6 py-6 sm:px-10"
+        className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-6 py-6 sm:px-10 ${
+          aboutOpen ? "z-[60]" : "z-40"
+        }`}
       >
         <Link
           href="/"
@@ -1483,7 +1485,7 @@ export function WavePortfolio({
         >
           {site.shortName}
         </Link>
-        {!aboutOpen ? (
+        {!overlayOpen ? (
           <nav
             aria-label="Portfolio"
             className="pointer-events-auto absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 items-center gap-3"
@@ -1513,7 +1515,7 @@ export function WavePortfolio({
             </button>
           </nav>
         ) : null}
-        {!aboutOpen ? (
+        {!overlayOpen ? (
           <button
             type="button"
             onClick={() => {
@@ -1529,18 +1531,20 @@ export function WavePortfolio({
         )}
       </div>
 
-      <div
-        data-chrome
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex items-end justify-between gap-4 px-6 py-6 sm:px-10"
-      >
-        <p className="wave-chrome px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/55">
-          {track === "branding" ? "We know Branding" : "We know Shopify"}
-        </p>
-        <TrackOfTheDay className="absolute bottom-6 left-1/2 z-50 -translate-x-1/2 sm:bottom-8" />
-        <p className="wave-chrome relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80">
-          Contact
-        </p>
-      </div>
+      {!overlayOpen ? (
+        <div
+          data-chrome
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex items-end justify-between gap-4 px-6 py-6 sm:px-10"
+        >
+          <p className="wave-chrome px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/55">
+            {track === "branding" ? "We know Branding" : "We know Shopify"}
+          </p>
+          <TrackOfTheDay className="absolute bottom-6 left-1/2 z-50 -translate-x-1/2 sm:bottom-8" />
+          <p className="wave-chrome relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80">
+            Contact
+          </p>
+        </div>
+      ) : null}
 
       <ul className="sr-only">
         {projects.map((item, index) => (
@@ -1555,7 +1559,7 @@ export function WavePortfolio({
       <AnimatePresence>
         {aboutOpen ? (
           <motion.div
-            className="absolute inset-0 z-30"
+            className="absolute inset-0 z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -1564,7 +1568,7 @@ export function WavePortfolio({
             <button
               type="button"
               aria-label="Close about"
-              className="absolute inset-0 cursor-default bg-transparent"
+              className="absolute inset-0 cursor-default bg-black/35"
               onClick={closeAbout}
             />
 
@@ -1573,183 +1577,311 @@ export function WavePortfolio({
               type="button"
               data-chrome
               onClick={closeAbout}
-              className="wave-chrome absolute top-6 right-6 z-40 px-2 py-2 font-normal tracking-[0.22em] uppercase text-white/85 sm:top-8 sm:right-10"
+              className="wave-chrome absolute top-6 right-6 z-[60] px-2 py-2 font-normal tracking-[0.22em] uppercase text-white/85 sm:top-8 sm:right-10"
             >
               Close
             </button>
 
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="about-title"
-              data-about-dialog
-              data-chrome
-              onPointerEnter={() => setAboutHover(true)}
-              onPointerLeave={() => setAboutHover(false)}
-              className="pointer-events-none absolute inset-0 flex items-center justify-center"
-              initial={{ scale: 0.35, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.72, opacity: 0 }}
-              transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div
-                className="pointer-events-auto relative flex aspect-square w-[min(64vw,64dvh)] flex-col items-center justify-center overflow-visible sm:w-[min(58vw,58dvh)]"
-                onClick={(event) => event.stopPropagation()}
+            {mobile ? (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="about-title"
+                data-about-dialog
+                data-chrome
+                className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                initial={{ scale: 0.72, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.86, opacity: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               >
-                {/* Three.js owns the actual liquid-metal portal. This layer only
-                    provides the deep black aperture behind the copy. */}
                 <div
-                  aria-hidden
-                  className="pointer-events-none absolute left-1/2 top-1/2 z-0 aspect-square w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{
-                    background:
-                      "radial-gradient(circle, #000 0%, #000 64%, rgba(0,0,0,0.94) 74%, rgba(0,0,0,0) 100%)",
-                    boxShadow:
-                      "0 0 80px rgba(0,0,0,0.95), inset 0 0 50px rgba(0,0,0,1)",
-                  }}
-                />
-
-                <AnimatePresence>
-                  {aboutPortrait === "joshua" ? (
-                    <motion.button
-                      key="about-go-back"
-                      type="button"
-                      onClick={() => setAboutPortrait(null)}
-                      className="absolute top-[4%] left-1/2 z-20 -translate-x-1/2 text-[10px] tracking-[0.2em] uppercase text-white/70 transition-colors hover:text-white"
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      Go back
-                    </motion.button>
-                  ) : null}
-                </AnimatePresence>
-
-                <div className="relative z-10 flex aspect-square w-[74%] items-center justify-center overflow-hidden rounded-full text-center text-white">
-                  <h2 id="about-title" className="sr-only">
-                    About
-                  </h2>
-                  <AnimatePresence mode="wait" initial={false}>
-                    {aboutPortrait === "joshua" ? (
-                      <motion.div
-                        key="joshua-portrait"
-                        className="absolute inset-0 overflow-hidden rounded-full"
-                        initial={{ opacity: 0, scale: 1.04 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                      >
-                        <img
-                          src="/images/studio/joshua-corby.jpg"
-                          alt="Joshua Corby"
-                          className="h-full w-full object-cover object-[50%_18%] grayscale"
-                          draggable={false}
-                        />
-                        {/* Soft dissolve into the black aperture so the cutout
-                            feels continuous with the portal, not a hard photo. */}
-                        <span
-                          aria-hidden
-                          className="pointer-events-none absolute inset-0"
-                          style={{
-                            background:
-                              "radial-gradient(circle at 50% 42%, transparent 34%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0.92) 78%, #000 92%)",
-                          }}
-                        />
-                        <span
-                          aria-hidden
-                          className="pointer-events-none absolute inset-0"
-                          style={{
-                            background:
-                              "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)",
-                          }}
-                        />
-                        <span className="pointer-events-none absolute inset-x-0 bottom-[14%] text-[10px] tracking-[0.2em] uppercase text-white/55">
-                          Joshua Corby
-                        </span>
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="about-copy"
-                        className="flex max-h-[86%] max-w-[min(34rem,88%)] flex-col items-center justify-center px-6"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      >
-                        <p className="max-w-[34ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90">
-                          {studio.about}
-                        </p>
-                        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[10px] tracking-[0.16em] uppercase text-white/45">
-                          {studio.people.map((person) => {
-                            const isJoshua = person.name === "Joshua Corby";
-                            if (isJoshua) {
+                  className="pointer-events-auto relative aspect-square w-[min(94vw,78dvh)]"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {/* Outer chrome rim — iridescent liquid metal */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background:
+                        "conic-gradient(from 200deg, #f7f3ee, #9eb4c8 10%, #e8d9c8 18%, #c4a8d4 28%, #f0ebe4 38%, #6a7a8a 48%, #dce8f0 58%, #b89878 68%, #eef2f6 78%, #8a9aac 88%, #f7f3ee)",
+                      boxShadow:
+                        "0 18px 50px rgba(0,0,0,0.55), inset 0 1px 1px rgba(255,255,255,0.55)",
+                    }}
+                  />
+                  {/* Specular highlight on metal */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-[1.5%] rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 30% 22%, rgba(255,255,255,0.7), transparent 38%), radial-gradient(circle at 78% 72%, rgba(120,160,220,0.25), transparent 40%), radial-gradient(circle at 55% 55%, transparent 55%, rgba(0,0,0,0.35) 100%)",
+                    }}
+                  />
+                  {/* Inner bevel / dark channel */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-[7%] rounded-full"
+                    style={{
+                      background:
+                        "conic-gradient(from 30deg, #1a1816, #5a5550 20%, #0c0b0a 40%, #7a746c 60%, #121110 80%, #1a1816)",
+                      boxShadow: "inset 0 0 22px rgba(0,0,0,0.85)",
+                    }}
+                  />
+                  {/* Aperture */}
+                  <div className="absolute inset-[10.5%] overflow-hidden rounded-full bg-[#050505] shadow-[inset_0_0_60px_rgba(0,0,0,1)]">
+                    <h2 id="about-title" className="sr-only">
+                      About
+                    </h2>
+                    <AnimatePresence mode="wait" initial={false}>
+                      {aboutPortrait === "joshua" ? (
+                        <motion.div
+                          key="joshua-portrait-mobile"
+                          className="absolute inset-0"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.35 }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setAboutPortrait(null)}
+                            className="absolute inset-x-0 top-6 z-10 text-[10px] tracking-[0.22em] uppercase text-white/75"
+                          >
+                            Go back
+                          </button>
+                          <img
+                            src="/images/studio/joshua-corby.jpg"
+                            alt="Joshua Corby"
+                            className="h-full w-full object-cover object-[50%_18%] grayscale"
+                            draggable={false}
+                          />
+                          <span
+                            aria-hidden
+                            className="pointer-events-none absolute inset-0"
+                            style={{
+                              background:
+                                "radial-gradient(circle at 50% 42%, transparent 40%, rgba(0,0,0,0.55) 78%, #000 100%)",
+                            }}
+                          />
+                          <span className="pointer-events-none absolute inset-x-0 bottom-10 text-center text-[10px] tracking-[0.22em] uppercase text-white/55">
+                            Joshua Corby
+                          </span>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="about-copy-mobile"
+                          className="flex h-full flex-col items-center justify-center px-[11%] text-center"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.35 }}
+                        >
+                          <p className="max-w-[28ch] text-[0.95rem] leading-[1.5] tracking-[-0.015em] text-white/92">
+                            {studio.about}
+                          </p>
+                          <p className="mt-6 max-w-[30ch] text-[9px] leading-relaxed tracking-[0.14em] uppercase text-white/40">
+                            {studio.people.map((person, index) => {
+                              const isJoshua = person.name === "Joshua Corby";
+                              const sep =
+                                index < studio.people.length - 1 ? (
+                                  <span key={`${person.name}-sep`} className="text-white/20">
+                                    {" · "}
+                                  </span>
+                                ) : null;
+                              if (isJoshua) {
+                                return (
+                                  <span key={person.name}>
+                                    <button
+                                      type="button"
+                                      onClick={() => setAboutPortrait("joshua")}
+                                      className="tracking-[0.14em] uppercase text-white/55"
+                                    >
+                                      {person.name} — {person.role}
+                                    </button>
+                                    {sep}
+                                  </span>
+                                );
+                              }
                               return (
-                                <button
-                                  key={person.name}
-                                  type="button"
-                                  onClick={() => setAboutPortrait("joshua")}
-                                  className="text-[10px] tracking-[0.16em] uppercase transition-colors hover:text-white"
-                                >
+                                <span key={person.name}>
+                                  {person.name} — {person.role}
+                                  {sep}
+                                </span>
+                              );
+                            })}
+                          </p>
+                          <a
+                            href={`mailto:${site.email}`}
+                            className="mt-7 text-[10px] tracking-[0.22em] uppercase text-white/70"
+                          >
+                            Email
+                          </a>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="about-title"
+                data-about-dialog
+                data-chrome
+                onPointerEnter={() => setAboutHover(true)}
+                onPointerLeave={() => setAboutHover(false)}
+                className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                initial={{ scale: 0.35, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.72, opacity: 0 }}
+                transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div
+                  className="pointer-events-auto relative flex aspect-square w-[min(64vw,64dvh)] flex-col items-center justify-center overflow-visible sm:w-[min(58vw,58dvh)]"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute left-1/2 top-1/2 z-0 aspect-square w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(circle, #000 0%, #000 64%, rgba(0,0,0,0.94) 74%, rgba(0,0,0,0) 100%)",
+                      boxShadow:
+                        "0 0 80px rgba(0,0,0,0.95), inset 0 0 50px rgba(0,0,0,1)",
+                    }}
+                  />
+
+                  <AnimatePresence>
+                    {aboutPortrait === "joshua" ? (
+                      <motion.button
+                        key="about-go-back"
+                        type="button"
+                        onClick={() => setAboutPortrait(null)}
+                        className="absolute top-[4%] left-1/2 z-20 -translate-x-1/2 text-[10px] tracking-[0.2em] uppercase text-white/70 transition-colors hover:text-white"
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 4 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        Go back
+                      </motion.button>
+                    ) : null}
+                  </AnimatePresence>
+
+                  <div className="relative z-10 flex aspect-square w-[74%] items-center justify-center overflow-hidden rounded-full text-center text-white">
+                    <h2 id="about-title" className="sr-only">
+                      About
+                    </h2>
+                    <AnimatePresence mode="wait" initial={false}>
+                      {aboutPortrait === "joshua" ? (
+                        <motion.div
+                          key="joshua-portrait"
+                          className="absolute inset-0 overflow-hidden rounded-full"
+                          initial={{ opacity: 0, scale: 1.04 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                          <img
+                            src="/images/studio/joshua-corby.jpg"
+                            alt="Joshua Corby"
+                            className="h-full w-full object-cover object-[50%_18%] grayscale"
+                            draggable={false}
+                          />
+                          <span
+                            aria-hidden
+                            className="pointer-events-none absolute inset-0"
+                            style={{
+                              background:
+                                "radial-gradient(circle at 50% 42%, transparent 34%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0.92) 78%, #000 92%)",
+                            }}
+                          />
+                          <span
+                            aria-hidden
+                            className="pointer-events-none absolute inset-0"
+                            style={{
+                              background:
+                                "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)",
+                            }}
+                          />
+                          <span className="pointer-events-none absolute inset-x-0 bottom-[14%] text-[10px] tracking-[0.2em] uppercase text-white/55">
+                            Joshua Corby
+                          </span>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="about-copy"
+                          className="flex max-h-[86%] max-w-[min(34rem,88%)] flex-col items-center justify-center px-6"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                          <p className="max-w-[34ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90">
+                            {studio.about}
+                          </p>
+                          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[10px] tracking-[0.16em] uppercase text-white/45">
+                            {studio.people.map((person) => {
+                              const isJoshua = person.name === "Joshua Corby";
+                              if (isJoshua) {
+                                return (
+                                  <button
+                                    key={person.name}
+                                    type="button"
+                                    onClick={() => setAboutPortrait("joshua")}
+                                    className="text-[10px] tracking-[0.16em] uppercase transition-colors hover:text-white"
+                                  >
+                                    {person.name}
+                                    <span className="mx-1.5 text-white/20">·</span>
+                                    {person.role}
+                                  </button>
+                                );
+                              }
+                              return (
+                                <span key={person.name}>
                                   {person.name}
                                   <span className="mx-1.5 text-white/20">·</span>
                                   {person.role}
-                                </button>
+                                </span>
                               );
-                            }
-                            return (
-                              <span key={person.name}>
-                                {person.name}
-                                <span className="mx-1.5 text-white/20">·</span>
-                                {person.role}
-                              </span>
-                            );
-                          })}
-                        </div>
-                        <a
-                          href={`mailto:${site.email}`}
-                          className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
-                        >
-                          Email
-                        </a>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                            })}
+                          </div>
+                          <a
+                            href={`mailto:${site.email}`}
+                            className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
+                          >
+                            Email
+                          </a>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
           </motion.div>
         ) : null}
       </AnimatePresence>
 
       <AnimatePresence>
         {project && active !== null ? (
-          <motion.div
-            className="absolute inset-0 z-30 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-          >
-            <button
-              type="button"
-              aria-label="Close project"
-              className="absolute inset-0 bg-black/35"
-              onClick={() => setActive(null)}
-            />
-
-            <div className="relative z-10 h-full w-full overflow-hidden py-3 sm:py-4 md:py-5">
-              {prevProject && prevIndex !== null && projects.length > 1 ? (
-                <button
-                  type="button"
-                  aria-label={`Previous project: ${prevProject.title}`}
-                  onClick={() => goProject(prevIndex)}
-                  className="absolute top-[7%] bottom-[7%] left-0 z-0 w-[min(90vw,70rem)] -translate-x-[calc(100%-2.5rem)] overflow-hidden rounded-[1.85rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:-translate-x-[calc(100%-2.85rem)] md:top-[8%] md:bottom-[8%] md:-translate-x-[calc(100%-3.1rem)]"
-                >
-                  <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.5),rgba(0,0,0,0.72))]" />
-                  <span className="sr-only">{prevProject.title}</span>
-                </button>
-              ) : null}
+          mobile ? (
+            <motion.div
+              className="absolute inset-0 z-50 flex items-end justify-center sm:items-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <button
+                type="button"
+                aria-label="Close project"
+                className="absolute inset-0 bg-black/45"
+                onClick={() => setActive(null)}
+              />
 
               <motion.div
                 key={project.slug}
@@ -1757,121 +1889,24 @@ export function WavePortfolio({
                 aria-modal="true"
                 aria-labelledby="project-title"
                 data-project-dialog
-                onPointerDown={(event) => {
-                  if ((event.target as HTMLElement).closest("a, button, [data-gallery]")) return;
-                  const startX = event.clientX;
-                  const startY = event.clientY;
-                  const onUp = (up: PointerEvent) => {
-                    window.removeEventListener("pointerup", onUp);
-                    const dx = up.clientX - startX;
-                    const dy = up.clientY - startY;
-                    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
-                    if (projects.length < 2) return;
-                    if (dx > 0 && prevIndex !== null) goProject(prevIndex);
-                    else if (dx < 0 && nextIndex !== null) goProject(nextIndex);
-                  };
-                  window.addEventListener("pointerup", onUp);
-                }}
-                className="relative z-10 mx-[3.35rem] h-full overflow-visible text-[#111] sm:mx-[3.75rem] md:mx-[4.25rem]"
-                initial={{ x: 28, opacity: 0.85, scale: 0.985 }}
-                animate={{ x: 0, opacity: 1, scale: 1 }}
-                exit={{ x: -28, opacity: 0.85, scale: 0.985 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                data-chrome
+                className="relative z-10 flex h-[min(92dvh,100%)] w-full flex-col overflow-hidden rounded-t-[1.75rem] bg-white text-[#111] shadow-[0_-20px_60px_rgba(0,0,0,0.4)]"
+                initial={{ y: 40, opacity: 0.9 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 28, opacity: 0.9 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                onClick={(event) => event.stopPropagation()}
               >
-                <div className="relative flex h-full flex-col md:flex-row">
-                  <svg
-                    className="pointer-events-none absolute inset-0 h-full w-full overflow-visible drop-shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
-                    viewBox="0 0 1 1"
-                    preserveAspectRatio="none"
-                    aria-hidden
-                  >
-                    <defs>
-                      <clipPath id={`project-bulge-clip-${projectBulgeId}`} clipPathUnits="objectBoundingBox">
-                        <path d={popupBulgePath} />
-                      </clipPath>
-                    </defs>
-                    <path d={popupBulgePath} fill="#ffffff" />
-                  </svg>
-
-                  <div
-                    className="relative z-10 flex min-h-0 w-full flex-1 flex-col md:flex-row"
-                    style={{ clipPath: `url(#project-bulge-clip-${projectBulgeId})` }}
-                  >
-                    <div className="hide-scrollbar flex shrink-0 flex-col px-7 pt-10 pb-8 sm:px-10 md:w-[34%] md:overflow-y-auto md:px-12 md:pt-14">
-                      <h2 id="project-title" className="display text-[clamp(2.5rem,4.4vw,4.3rem)]">
-                        {project.title}
-                      </h2>
-                      <p className="mt-6 max-w-[36ch] text-[15px] leading-relaxed text-black/70">
-                        {project.summary}
-                      </p>
-                      {project.result ? (
-                        <p className="mt-5 max-w-[36ch] text-[14px] leading-relaxed text-black/50">
-                          {project.result}
-                        </p>
-                      ) : null}
-                      <div className="mt-8 flex flex-wrap items-center gap-2">
-                        <a
-                          href={project.liveUrl ?? `/work/${project.slug}`}
-                          target={project.liveUrl ? "_blank" : undefined}
-                          rel={project.liveUrl ? "noreferrer" : undefined}
-                          className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
-                          aria-label={
-                            project.liveUrl
-                              ? `Visit ${project.title}`
-                              : `Open ${project.title} case study`
-                          }
-                        >
-                          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-                            <path
-                              d="M2 7h10M8 3l4 4-4 4"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.4"
-                            />
-                          </svg>
-                        </a>
-                        {[project.client, project.industry, project.services[0]]
-                          .filter(Boolean)
-                          .map((pill) => (
-                            <span
-                              key={pill}
-                              className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
-                            >
-                              {pill}
-                            </span>
-                          ))}
-                      </div>
-                      <Link
-                        href={`/work/${project.slug}`}
-                        className="mt-8 text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
-                      >
-                        Case study
-                      </Link>
-                    </div>
-
-                    <div
-                      data-gallery
-                      className="hide-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:px-5 md:pt-5 md:pb-5"
-                      onScroll={(event) => {
-                        const el = event.currentTarget;
-                        const max = Math.max(el.scrollHeight - el.clientHeight, 1);
-                        setPopupScroll(Math.min(1, Math.max(0, el.scrollTop / max)));
-                      }}
-                    >
-                      <div className="flex flex-col gap-4 md:gap-5">
-                        {project.frames.map((src) => (
-                          <RippleFrame key={src} src={src} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
+                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-black/8 px-5 py-4">
+                  <h2 id="project-title" className="display min-w-0 truncate text-[1.65rem] leading-none">
+                    {project.title}
+                  </h2>
                   <button
                     ref={closeRef}
                     type="button"
                     aria-label="Close"
                     onClick={() => setActive(null)}
-                    className="absolute top-4 right-4 z-30 grid h-11 w-11 place-items-center rounded-full bg-black text-white"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-black text-white"
                   >
                     <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
                       <path
@@ -1883,21 +1918,268 @@ export function WavePortfolio({
                     </svg>
                   </button>
                 </div>
-              </motion.div>
 
-              {nextProject && nextIndex !== null && projects.length > 1 ? (
-                <button
-                  type="button"
-                  aria-label={`Next project: ${nextProject.title}`}
-                  onClick={() => goProject(nextIndex)}
-                  className="absolute top-[7%] bottom-[7%] right-0 z-0 w-[min(90vw,70rem)] translate-x-[calc(100%-2.5rem)] overflow-hidden rounded-[1.85rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:translate-x-[calc(100%-2.85rem)] md:top-[8%] md:bottom-[8%] md:translate-x-[calc(100%-3.1rem)]"
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+                  <div className="px-5 pt-5 pb-4">
+                    <p className="text-[15px] leading-relaxed text-black/70">{project.summary}</p>
+                    {project.result ? (
+                      <p className="mt-4 text-[14px] leading-relaxed text-black/50">{project.result}</p>
+                    ) : null}
+                    <div className="mt-6 flex flex-wrap items-center gap-2">
+                      <a
+                        href={project.liveUrl ?? `/work/${project.slug}`}
+                        target={project.liveUrl ? "_blank" : undefined}
+                        rel={project.liveUrl ? "noreferrer" : undefined}
+                        className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
+                        aria-label={
+                          project.liveUrl
+                            ? `Visit ${project.title}`
+                            : `Open ${project.title} case study`
+                        }
+                      >
+                        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                          <path
+                            d="M2 7h10M8 3l4 4-4 4"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                          />
+                        </svg>
+                      </a>
+                      {[project.client, project.industry, project.services[0]]
+                        .filter(Boolean)
+                        .map((pill) => (
+                          <span
+                            key={pill}
+                            className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
+                          >
+                            {pill}
+                          </span>
+                        ))}
+                    </div>
+                    <Link
+                      href={`/work/${project.slug}`}
+                      className="mt-5 inline-block text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
+                    >
+                      Case study
+                    </Link>
+                  </div>
+
+                  <div className="flex flex-col gap-3 px-4 pb-8">
+                    {project.frames.map((src) => (
+                      <img
+                        key={src}
+                        src={src}
+                        alt=""
+                        className="block h-auto w-full rounded-[1rem] object-cover"
+                        draggable={false}
+                      />
+                    ))}
+                  </div>
+
+                  {projects.length > 1 ? (
+                    <div className="flex items-center justify-between gap-3 border-t border-black/8 px-5 py-4">
+                      {prevIndex !== null && prevProject ? (
+                        <button
+                          type="button"
+                          onClick={() => goProject(prevIndex)}
+                          className="text-[11px] tracking-[0.16em] uppercase text-black/55"
+                        >
+                          ← {prevProject.title}
+                        </button>
+                      ) : (
+                        <span />
+                      )}
+                      {nextIndex !== null && nextProject ? (
+                        <button
+                          type="button"
+                          onClick={() => goProject(nextIndex)}
+                          className="text-[11px] tracking-[0.16em] uppercase text-black/55"
+                        >
+                          {nextProject.title} →
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="absolute inset-0 z-50 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <button
+                type="button"
+                aria-label="Close project"
+                className="absolute inset-0 bg-black/35"
+                onClick={() => setActive(null)}
+              />
+
+              <div className="relative z-10 h-full w-full overflow-hidden py-3 sm:py-4 md:py-5">
+                {prevProject && prevIndex !== null && projects.length > 1 ? (
+                  <button
+                    type="button"
+                    aria-label={`Previous project: ${prevProject.title}`}
+                    onClick={() => goProject(prevIndex)}
+                    className="absolute top-[7%] bottom-[7%] left-0 z-0 w-[min(90vw,70rem)] -translate-x-[calc(100%-2.5rem)] overflow-hidden rounded-[1.85rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:-translate-x-[calc(100%-2.85rem)] md:top-[8%] md:bottom-[8%] md:-translate-x-[calc(100%-3.1rem)]"
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.5),rgba(0,0,0,0.72))]" />
+                    <span className="sr-only">{prevProject.title}</span>
+                  </button>
+                ) : null}
+
+                <motion.div
+                  key={project.slug}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="project-title"
+                  data-project-dialog
+                  onPointerDown={(event) => {
+                    if ((event.target as HTMLElement).closest("a, button, [data-gallery]")) return;
+                    const startX = event.clientX;
+                    const startY = event.clientY;
+                    const onUp = (up: PointerEvent) => {
+                      window.removeEventListener("pointerup", onUp);
+                      const dx = up.clientX - startX;
+                      const dy = up.clientY - startY;
+                      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+                      if (projects.length < 2) return;
+                      if (dx > 0 && prevIndex !== null) goProject(prevIndex);
+                      else if (dx < 0 && nextIndex !== null) goProject(nextIndex);
+                    };
+                    window.addEventListener("pointerup", onUp);
+                  }}
+                  className="relative z-10 mx-[3.35rem] h-full overflow-visible text-[#111] sm:mx-[3.75rem] md:mx-[4.25rem]"
+                  initial={{ x: 28, opacity: 0.85, scale: 0.985 }}
+                  animate={{ x: 0, opacity: 1, scale: 1 }}
+                  exit={{ x: -28, opacity: 0.85, scale: 0.985 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <div className="absolute inset-0 bg-[linear-gradient(270deg,rgba(0,0,0,0.5),rgba(0,0,0,0.72))]" />
-                  <span className="sr-only">{nextProject.title}</span>
-                </button>
-              ) : null}
-            </div>
-          </motion.div>
+                  <div className="relative flex h-full flex-col md:flex-row">
+                    <svg
+                      className="pointer-events-none absolute inset-0 h-full w-full overflow-visible drop-shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
+                      viewBox="0 0 1 1"
+                      preserveAspectRatio="none"
+                      aria-hidden
+                    >
+                      <defs>
+                        <clipPath id={`project-bulge-clip-${projectBulgeId}`} clipPathUnits="objectBoundingBox">
+                          <path d={popupBulgePath} />
+                        </clipPath>
+                      </defs>
+                      <path d={popupBulgePath} fill="#ffffff" />
+                    </svg>
+
+                    <div
+                      className="relative z-10 flex min-h-0 w-full flex-1 flex-col md:flex-row"
+                      style={{ clipPath: `url(#project-bulge-clip-${projectBulgeId})` }}
+                    >
+                      <div className="hide-scrollbar flex shrink-0 flex-col px-7 pt-10 pb-8 sm:px-10 md:w-[34%] md:overflow-y-auto md:px-12 md:pt-14">
+                        <h2 id="project-title" className="display text-[clamp(2.5rem,4.4vw,4.3rem)]">
+                          {project.title}
+                        </h2>
+                        <p className="mt-6 max-w-[36ch] text-[15px] leading-relaxed text-black/70">
+                          {project.summary}
+                        </p>
+                        {project.result ? (
+                          <p className="mt-5 max-w-[36ch] text-[14px] leading-relaxed text-black/50">
+                            {project.result}
+                          </p>
+                        ) : null}
+                        <div className="mt-8 flex flex-wrap items-center gap-2">
+                          <a
+                            href={project.liveUrl ?? `/work/${project.slug}`}
+                            target={project.liveUrl ? "_blank" : undefined}
+                            rel={project.liveUrl ? "noreferrer" : undefined}
+                            className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
+                            aria-label={
+                              project.liveUrl
+                                ? `Visit ${project.title}`
+                                : `Open ${project.title} case study`
+                            }
+                          >
+                            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                              <path
+                                d="M2 7h10M8 3l4 4-4 4"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.4"
+                              />
+                            </svg>
+                          </a>
+                          {[project.client, project.industry, project.services[0]]
+                            .filter(Boolean)
+                            .map((pill) => (
+                              <span
+                                key={pill}
+                                className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
+                              >
+                                {pill}
+                              </span>
+                            ))}
+                        </div>
+                        <Link
+                          href={`/work/${project.slug}`}
+                          className="mt-8 text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
+                        >
+                          Case study
+                        </Link>
+                      </div>
+
+                      <div
+                        data-gallery
+                        className="hide-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:px-5 md:pt-5 md:pb-5"
+                        onScroll={(event) => {
+                          const el = event.currentTarget;
+                          const max = Math.max(el.scrollHeight - el.clientHeight, 1);
+                          setPopupScroll(Math.min(1, Math.max(0, el.scrollTop / max)));
+                        }}
+                      >
+                        <div className="flex flex-col gap-4 md:gap-5">
+                          {project.frames.map((src) => (
+                            <RippleFrame key={src} src={src} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      ref={closeRef}
+                      type="button"
+                      aria-label="Close"
+                      onClick={() => setActive(null)}
+                      className="absolute top-4 right-4 z-30 grid h-11 w-11 place-items-center rounded-full bg-black text-white"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                        <path
+                          d="M1 1l12 12M13 1L1 13"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </motion.div>
+
+                {nextProject && nextIndex !== null && projects.length > 1 ? (
+                  <button
+                    type="button"
+                    aria-label={`Next project: ${nextProject.title}`}
+                    onClick={() => goProject(nextIndex)}
+                    className="absolute top-[7%] bottom-[7%] right-0 z-0 w-[min(90vw,70rem)] translate-x-[calc(100%-2.5rem)] overflow-hidden rounded-[1.85rem] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] sm:translate-x-[calc(100%-2.85rem)] md:top-[8%] md:bottom-[8%] md:translate-x-[calc(100%-3.1rem)]"
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(270deg,rgba(0,0,0,0.5),rgba(0,0,0,0.72))]" />
+                    <span className="sr-only">{nextProject.title}</span>
+                  </button>
+                ) : null}
+              </div>
+            </motion.div>
+          )
         ) : null}
       </AnimatePresence>
     </div>
