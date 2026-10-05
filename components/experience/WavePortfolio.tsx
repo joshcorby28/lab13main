@@ -14,13 +14,21 @@ export type WaveProject = {
   client: string;
   industry: string;
   summary: string;
+  intro: string;
   services: string[];
+  technologies: string[];
   liveUrl?: string;
+  liveShot?: string;
   card: string;
   cardVideo?: string;
   frames: string[];
   tone: string;
-  result?: string;
+  overview: string;
+  challenge: string;
+  solution: string;
+  development: string;
+  results?: string[];
+  quote?: { text: string; attribution: string };
   plus?: boolean;
 };
 
@@ -522,6 +530,139 @@ function RippleFrame({ src }: { src: string }) {
           webglReady ? "opacity-100" : "opacity-0"
         }`}
       />
+    </div>
+  );
+}
+
+function LiveSitePreview({
+  url,
+}: {
+  url: string;
+}) {
+  const host = (() => {
+    try {
+      return new URL(url).host.replace(/^www\./, "");
+    } catch {
+      return url;
+    }
+  })();
+
+  return (
+    <div className="flex h-full min-h-[22rem] w-full flex-col overflow-hidden rounded-[1.1rem] bg-[#eceae6] ring-1 ring-black/10">
+      <div className="flex h-9 shrink-0 items-center gap-2 border-b border-black/8 bg-[#f4f2ef] px-3">
+        <span className="flex gap-1" aria-hidden>
+          <span className="size-1.5 rounded-full bg-black/18" />
+          <span className="size-1.5 rounded-full bg-black/18" />
+          <span className="size-1.5 rounded-full bg-black/18" />
+        </span>
+        <span className="min-w-0 flex-1 truncate text-center text-[10px] tracking-[0.08em] text-black/40">
+          {host}
+        </span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="shrink-0 text-[9px] tracking-[0.16em] uppercase text-black/45"
+        >
+          Open
+        </a>
+      </div>
+      <div className="grid min-h-0 flex-1 place-items-center bg-white px-6 text-center text-[12px] tracking-[0.14em] uppercase text-black/35">
+        Preview coming soon
+      </div>
+    </div>
+  );
+}
+
+function ProjectCaseBody({ project }: { project: WaveProject }) {
+  return (
+    <div className="space-y-8">
+      <p className="text-[15px] leading-relaxed text-black/70">{project.intro}</p>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {project.liveUrl ? (
+          <a
+            href={project.liveUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
+            aria-label={`Visit ${project.title}`}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+              <path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="white" strokeWidth="1.4" />
+            </svg>
+          </a>
+        ) : null}
+        {[project.client, project.industry, ...project.services]
+          .filter(Boolean)
+          .map((pill) => (
+            <span
+              key={pill}
+              className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
+            >
+              {pill}
+            </span>
+          ))}
+      </div>
+
+      <section>
+        <p className="text-[10px] tracking-[0.18em] uppercase text-black/35">Overview</p>
+        <p className="mt-3 text-[15px] leading-relaxed text-black/70">{project.overview}</p>
+      </section>
+
+      <div className="grid gap-8 sm:grid-cols-2">
+        <section>
+          <p className="text-[10px] tracking-[0.18em] uppercase text-black/35">Challenge</p>
+          <p className="mt-3 text-[14px] leading-relaxed text-black/65">{project.challenge}</p>
+        </section>
+        <section>
+          <p className="text-[10px] tracking-[0.18em] uppercase text-black/35">Solution</p>
+          <p className="mt-3 text-[14px] leading-relaxed text-black/65">{project.solution}</p>
+        </section>
+      </div>
+
+      <section>
+        <p className="text-[10px] tracking-[0.18em] uppercase text-black/35">Development</p>
+        <p className="mt-3 text-[14px] leading-relaxed text-black/65">{project.development}</p>
+      </section>
+
+      {project.results?.length ? (
+        <section>
+          <p className="text-[10px] tracking-[0.18em] uppercase text-black/35">Results</p>
+          <ul className="mt-3 space-y-2">
+            {project.results.map((result) => (
+              <li key={result} className="border-t border-black/8 pt-2 text-[14px] leading-snug text-black/70">
+                {result}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {project.quote ? (
+        <blockquote className="border-t border-black/8 pt-6">
+          <p className="text-[1.05rem] leading-snug text-black/80 italic">“{project.quote.text}”</p>
+          <footer className="mt-3 text-[10px] tracking-[0.16em] uppercase text-black/40">
+            {project.quote.attribution}
+          </footer>
+        </blockquote>
+      ) : null}
+
+      {project.technologies.length ? (
+        <section>
+          <p className="text-[10px] tracking-[0.18em] uppercase text-black/35">Technologies</p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {project.technologies.map((tech) => (
+              <li
+                key={tech}
+                className="rounded-full border border-black/15 px-3 py-1.5 text-[10px] tracking-[0.14em] uppercase text-black/55"
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }
@@ -1920,62 +2061,29 @@ export function WavePortfolio({
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
-                  <div className="px-5 pt-5 pb-4">
-                    <p className="text-[15px] leading-relaxed text-black/70">{project.summary}</p>
-                    {project.result ? (
-                      <p className="mt-4 text-[14px] leading-relaxed text-black/50">{project.result}</p>
-                    ) : null}
-                    <div className="mt-6 flex flex-wrap items-center gap-2">
-                      <a
-                        href={project.liveUrl ?? `/work/${project.slug}`}
-                        target={project.liveUrl ? "_blank" : undefined}
-                        rel={project.liveUrl ? "noreferrer" : undefined}
-                        className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
-                        aria-label={
-                          project.liveUrl
-                            ? `Visit ${project.title}`
-                            : `Open ${project.title} case study`
-                        }
-                      >
-                        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-                          <path
-                            d="M2 7h10M8 3l4 4-4 4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.4"
-                          />
-                        </svg>
-                      </a>
-                      {[project.client, project.industry, project.services[0]]
-                        .filter(Boolean)
-                        .map((pill) => (
-                          <span
-                            key={pill}
-                            className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
-                          >
-                            {pill}
-                          </span>
-                        ))}
-                    </div>
-                    <Link
-                      href={`/work/${project.slug}`}
-                      className="mt-5 inline-block text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
-                    >
-                      Case study
-                    </Link>
+                  <div className="px-5 pt-5 pb-6">
+                    <ProjectCaseBody project={project} />
                   </div>
 
-                  <div className="flex flex-col gap-3 px-4 pb-8">
-                    {project.frames.map((src) => (
-                      <img
-                        key={src}
-                        src={src}
-                        alt=""
-                        className="block h-auto w-full rounded-[1rem] object-cover"
-                        draggable={false}
-                      />
-                    ))}
-                  </div>
+                  {project.liveUrl ? (
+                    <div className="px-4 pb-4">
+                      <div className="h-[min(52dvh,28rem)]">
+                        <LiveSitePreview url={project.liveUrl} />
+                      </div>
+                    </div>
+                  ) : project.frames.length > 0 ? (
+                    <div className="flex flex-col gap-3 px-4 pb-8">
+                      {project.frames.map((src) => (
+                        <img
+                          key={src}
+                          src={src}
+                          alt=""
+                          className="block h-auto w-full rounded-[1rem] object-cover"
+                          draggable={false}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
 
                   {projects.length > 1 ? (
                     <div className="flex items-center justify-between gap-3 border-t border-black/8 px-5 py-4">
@@ -2078,72 +2186,39 @@ export function WavePortfolio({
                       className="relative z-10 flex min-h-0 w-full flex-1 flex-col md:flex-row"
                       style={{ clipPath: `url(#project-bulge-clip-${projectBulgeId})` }}
                     >
-                      <div className="hide-scrollbar flex shrink-0 flex-col px-7 pt-10 pb-8 sm:px-10 md:w-[34%] md:overflow-y-auto md:px-12 md:pt-14">
+                      <div className="hide-scrollbar min-h-0 w-full overflow-y-auto px-7 pt-10 pb-8 sm:px-10 md:w-[40%] md:px-12 md:pt-14">
                         <h2 id="project-title" className="display text-[clamp(2.5rem,4.4vw,4.3rem)]">
                           {project.title}
                         </h2>
-                        <p className="mt-6 max-w-[36ch] text-[15px] leading-relaxed text-black/70">
-                          {project.summary}
-                        </p>
-                        {project.result ? (
-                          <p className="mt-5 max-w-[36ch] text-[14px] leading-relaxed text-black/50">
-                            {project.result}
-                          </p>
-                        ) : null}
-                        <div className="mt-8 flex flex-wrap items-center gap-2">
-                          <a
-                            href={project.liveUrl ?? `/work/${project.slug}`}
-                            target={project.liveUrl ? "_blank" : undefined}
-                            rel={project.liveUrl ? "noreferrer" : undefined}
-                            className="grid h-10 w-10 place-items-center rounded-full bg-black text-white"
-                            aria-label={
-                              project.liveUrl
-                                ? `Visit ${project.title}`
-                                : `Open ${project.title} case study`
-                            }
-                          >
-                            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-                              <path
-                                d="M2 7h10M8 3l4 4-4 4"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.4"
-                              />
-                            </svg>
-                          </a>
-                          {[project.client, project.industry, project.services[0]]
-                            .filter(Boolean)
-                            .map((pill) => (
-                              <span
-                                key={pill}
-                                className="rounded-full border border-black/15 px-3 py-2 text-[10px] tracking-[0.16em] uppercase"
-                              >
-                                {pill}
-                              </span>
-                            ))}
+                        <div className="mt-6">
+                          <ProjectCaseBody project={project} />
                         </div>
-                        <Link
-                          href={`/work/${project.slug}`}
-                          className="mt-8 text-[11px] tracking-[0.18em] uppercase underline underline-offset-[6px]"
-                        >
-                          Case study
-                        </Link>
                       </div>
 
                       <div
                         data-gallery
-                        className="hide-scrollbar min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:px-5 md:pt-5 md:pb-5"
-                        onScroll={(event) => {
-                          const el = event.currentTarget;
-                          const max = Math.max(el.scrollHeight - el.clientHeight, 1);
-                          setPopupScroll(Math.min(1, Math.max(0, el.scrollTop / max)));
-                        }}
+                        className={`min-h-0 flex-1 px-4 pb-4 md:px-5 md:pt-5 md:pb-5 ${
+                          project.liveUrl ? "overflow-hidden" : "hide-scrollbar overflow-y-auto"
+                        }`}
+                        onScroll={
+                          project.liveUrl
+                            ? undefined
+                            : (event) => {
+                                const el = event.currentTarget;
+                                const max = Math.max(el.scrollHeight - el.clientHeight, 1);
+                                setPopupScroll(Math.min(1, Math.max(0, el.scrollTop / max)));
+                              }
+                        }
                       >
-                        <div className="flex flex-col gap-4 md:gap-5">
-                          {project.frames.map((src) => (
-                            <RippleFrame key={src} src={src} />
-                          ))}
-                        </div>
+                        {project.liveUrl ? (
+                          <LiveSitePreview url={project.liveUrl} />
+                        ) : (
+                          <div className="flex flex-col gap-4 md:gap-5">
+                            {project.frames.map((src) => (
+                              <RippleFrame key={src} src={src} />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 

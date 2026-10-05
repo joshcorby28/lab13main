@@ -64,7 +64,7 @@ export function HomeHero() {
             transition={{ delay: 0.55, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             <Link
-              href="/work"
+              href="/"
               className="text-[0.85rem] tracking-[0.12em] uppercase underline decoration-line underline-offset-8 transition-colors hover:decoration-ink"
             >
               Selected work

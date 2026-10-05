@@ -27,8 +27,6 @@ function toWaveProject(project: Project): WaveProject {
   for (const item of project.gallery) {
     if (item.kind === "image") push(item.src);
   }
-  push(`/images/projects/previews/${project.slug}-full.jpg`);
-  push(`/images/projects/previews/${project.slug}-card.jpg`);
 
   const hasPreviewCard = project.category === "shopify";
   const tone = project.hero.kind === "field" ? tones[project.hero.tone] : "#1a1916";
@@ -39,8 +37,13 @@ function toWaveProject(project: Project): WaveProject {
     client: project.client,
     industry: project.industry,
     summary: project.summary,
+    intro: project.intro,
     services: project.services,
+    technologies: project.technologies,
     liveUrl: project.liveUrl,
+    liveShot: project.liveUrl
+      ? `/images/projects/previews/${project.slug}-full.jpg`
+      : undefined,
     card: hasPreviewCard
       ? `/images/projects/previews/${project.slug}-card.jpg`
       : "",
@@ -57,7 +60,12 @@ function toWaveProject(project: Project): WaveProject {
           ? [`/images/projects/previews/${project.slug}-full.jpg`]
           : [],
     tone,
-    result: project.results?.[0],
+    overview: project.overview,
+    challenge: project.challenge,
+    solution: project.solution,
+    development: project.development,
+    results: project.results,
+    quote: project.quote,
     plus: project.slug === "hylo-athletics" || project.slug === "maeving",
   };
 }

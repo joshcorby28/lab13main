@@ -43,7 +43,7 @@ function ProjectRow({
     <Reveal>
       <article className="border-t border-line py-10 last:border-b lg:py-16">
         <Link
-          href={`/work/${project.slug}`}
+          href="/"
           data-cursor="VIEW"
           className="group grid items-end gap-8 lg:grid-cols-12"
         >
@@ -79,7 +79,7 @@ function ProjectRow({
               ))}
             </ul>
             <p className="mt-8 text-[0.75rem] tracking-[0.16em] uppercase opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
-              Open case study
+              View work
             </p>
           </div>
         </Link>

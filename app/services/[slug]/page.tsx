@@ -96,7 +96,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
             <p className="eyebrow text-muted">Relevant work</p>
             <div className="mt-8 grid gap-10 md:grid-cols-2">
               {related.map((project) => (
-                <Link key={project.slug} href={`/work/${project.slug}`} data-cursor="VIEW" className="group">
+                <Link key={project.slug} href="/" data-cursor="VIEW" className="group">
                   <div className="relative aspect-[16/10] overflow-hidden bg-paper-2">
                     <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.04]">
                       <ProjectMedia media={project.hero} sizes="(min-width: 768px) 50vw, 100vw" />
