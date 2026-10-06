@@ -667,6 +667,25 @@ function ProjectCaseBody({ project }: { project: WaveProject }) {
   );
 }
 
+const ABOUT_PORTRAITS = {
+  joshua: {
+    name: "Joshua Corby",
+    src: "/images/studio/joshua-corby.jpg",
+  },
+  hayden: {
+    name: "Hayden Corby",
+    src: "/images/studio/hayden-corby.jpg",
+  },
+} as const;
+
+type AboutPortraitKey = keyof typeof ABOUT_PORTRAITS;
+
+function portraitKeyFor(name: string): AboutPortraitKey | null {
+  if (name === "Joshua Corby") return "joshua";
+  if (name === "Hayden Corby") return "hayden";
+  return null;
+}
+
 type PortfolioTrack = "shopify" | "branding";
 
 export function WavePortfolio({
@@ -684,7 +703,7 @@ export function WavePortfolio({
   const projects = track === "shopify" ? shopifyProjects : brandingProjects;
   const [active, setActive] = useState<number | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [aboutPortrait, setAboutPortrait] = useState<"joshua" | null>(null);
+  const [aboutPortrait, setAboutPortrait] = useState<AboutPortraitKey | null>(null);
   const [aboutHover, setAboutHover] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [popupScroll, setPopupScroll] = useState(0);
@@ -1776,9 +1795,9 @@ export function WavePortfolio({
                       About
                     </h2>
                     <AnimatePresence mode="wait" initial={false}>
-                      {aboutPortrait === "joshua" ? (
+                      {aboutPortrait ? (
                         <motion.div
-                          key="joshua-portrait-mobile"
+                          key={`${aboutPortrait}-portrait-mobile`}
                           className="absolute inset-0"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -1793,8 +1812,8 @@ export function WavePortfolio({
                             Go back
                           </button>
                           <img
-                            src="/images/studio/joshua-corby.jpg"
-                            alt="Joshua Corby"
+                            src={ABOUT_PORTRAITS[aboutPortrait].src}
+                            alt={ABOUT_PORTRAITS[aboutPortrait].name}
                             className="h-full w-full object-cover object-[50%_28%] grayscale"
                             draggable={false}
                           />
@@ -1807,7 +1826,7 @@ export function WavePortfolio({
                             }}
                           />
                           <span className="pointer-events-none absolute inset-x-0 bottom-10 text-center text-[10px] tracking-[0.22em] uppercase text-white/55">
-                            Joshua Corby
+                            {ABOUT_PORTRAITS[aboutPortrait].name}
                           </span>
                         </motion.div>
                       ) : (
@@ -1824,19 +1843,19 @@ export function WavePortfolio({
                           </p>
                           <p className="mt-6 max-w-[30ch] text-[9px] leading-relaxed tracking-[0.14em] uppercase text-white/40">
                             {studio.people.map((person, index) => {
-                              const isJoshua = person.name === "Joshua Corby";
+                              const key = portraitKeyFor(person.name);
                               const sep =
                                 index < studio.people.length - 1 ? (
                                   <span key={`${person.name}-sep`} className="text-white/20">
                                     {" · "}
                                   </span>
                                 ) : null;
-                              if (isJoshua) {
+                              if (key) {
                                 return (
                                   <span key={person.name}>
                                     <button
                                       type="button"
-                                      onClick={() => setAboutPortrait("joshua")}
+                                      onClick={() => setAboutPortrait(key)}
                                       className="tracking-[0.14em] uppercase text-white/55"
                                     >
                                       {person.name} — {person.role}
@@ -1896,7 +1915,7 @@ export function WavePortfolio({
                   />
 
                   <AnimatePresence>
-                    {aboutPortrait === "joshua" ? (
+                    {aboutPortrait ? (
                       <motion.button
                         key="about-go-back"
                         type="button"
@@ -1917,9 +1936,9 @@ export function WavePortfolio({
                       About
                     </h2>
                     <AnimatePresence mode="wait" initial={false}>
-                      {aboutPortrait === "joshua" ? (
+                      {aboutPortrait ? (
                         <motion.div
-                          key="joshua-portrait"
+                          key={`${aboutPortrait}-portrait`}
                           className="absolute inset-0 overflow-hidden rounded-full"
                           initial={{ opacity: 0, scale: 1.04 }}
                           animate={{ opacity: 1, scale: 1 }}
@@ -1927,8 +1946,8 @@ export function WavePortfolio({
                           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                         >
                           <img
-                            src="/images/studio/joshua-corby.jpg"
-                            alt="Joshua Corby"
+                            src={ABOUT_PORTRAITS[aboutPortrait].src}
+                            alt={ABOUT_PORTRAITS[aboutPortrait].name}
                             className="h-full w-full object-cover object-[50%_28%] grayscale"
                             draggable={false}
                           />
@@ -1949,7 +1968,7 @@ export function WavePortfolio({
                             }}
                           />
                           <span className="pointer-events-none absolute inset-x-0 bottom-[14%] text-[10px] tracking-[0.2em] uppercase text-white/55">
-                            Joshua Corby
+                            {ABOUT_PORTRAITS[aboutPortrait].name}
                           </span>
                         </motion.div>
                       ) : (
@@ -1966,13 +1985,13 @@ export function WavePortfolio({
                           </p>
                           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[10px] tracking-[0.16em] uppercase text-white/45">
                             {studio.people.map((person) => {
-                              const isJoshua = person.name === "Joshua Corby";
-                              if (isJoshua) {
+                              const key = portraitKeyFor(person.name);
+                              if (key) {
                                 return (
                                   <button
                                     key={person.name}
                                     type="button"
-                                    onClick={() => setAboutPortrait("joshua")}
+                                    onClick={() => setAboutPortrait(key)}
                                     className="text-[10px] tracking-[0.16em] uppercase transition-colors hover:text-white"
                                   >
                                     {person.name}
