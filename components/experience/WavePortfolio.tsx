@@ -1795,7 +1795,7 @@ export function WavePortfolio({
                           <img
                             src="/images/studio/joshua-corby.jpg"
                             alt="Joshua Corby"
-                            className="h-full w-full object-cover object-[50%_18%] grayscale"
+                            className="h-full w-full object-cover object-[50%_28%] grayscale"
                             draggable={false}
                           />
                           <span
@@ -1929,7 +1929,7 @@ export function WavePortfolio({
                           <img
                             src="/images/studio/joshua-corby.jpg"
                             alt="Joshua Corby"
-                            className="h-full w-full object-cover object-[50%_18%] grayscale"
+                            className="h-full w-full object-cover object-[50%_28%] grayscale"
                             draggable={false}
                           />
                           <span
