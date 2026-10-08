@@ -28,6 +28,35 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "golden-age-of-tennis",
+    title: "Golden Age of Tennis",
+    client: "Golden Age of Tennis",
+    industry: "Luxury sportswear & lifestyle",
+    summary:
+      "A Shopify store for Golden Age of Tennis — celebrating the glamour and style of 1970s tennis culture with a curated edit of vintage-inspired apparel and accessories.",
+    intro:
+      "Shopify store development for Golden Age of Tennis — a luxury lifestyle brand rooted in the golden era of the sport.",
+    services: ["Shopify development", "Store design", "E-commerce"],
+    technologies: ["Shopify", "Custom theme work", "Product merchandising"],
+    liveUrl: "https://goldenageoftennis.com/",
+    featured: true,
+    category: "shopify",
+    hero: {
+      kind: "image",
+      src: "/images/projects/golden-age-tennis-1.jpg",
+      alt: "Golden Age of Tennis campaign imagery — a tennis player in 1970s whites at dusk",
+    },
+    gallery: [],
+    overview:
+      "Golden Age of Tennis captures the spirit of 1970s tennis — the glamour, the style, and the culture that surrounded the sport's most iconic era. We built a Shopify store that puts that world front and centre, with a curated edit of vintage-inspired apparel and accessories.",
+    challenge:
+      "A lifestyle brand with a strong editorial identity needed a store that could carry the aesthetic without losing the commercial clarity required to convert.",
+    solution:
+      "A clean, considered Shopify storefront that lets the imagery and product do the talking — with a structure built for discovery and a confident path to purchase.",
+    development:
+      "Theme work, product presentation and merchandising tailored to a luxury lifestyle brand with a distinctive visual world.",
+  },
+  {
     slug: "hylo-athletics",
     title: "Hylo Athletics",
     client: "Hylo Athletics",
