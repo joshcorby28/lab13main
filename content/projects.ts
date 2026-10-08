@@ -43,7 +43,7 @@ export const projects: Project[] = [
     category: "shopify",
     hero: {
       kind: "image",
-      src: "/images/projects/golden-age-tennis-1.jpg",
+      src: "/images/projects/golden-age-of-tennis-1.jpg",
       alt: "Golden Age of Tennis campaign imagery — a tennis player in 1970s whites at dusk",
     },
     gallery: [],
