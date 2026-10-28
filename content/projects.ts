@@ -28,6 +28,35 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "bowflex-uk",
+    title: "BowFlex UK",
+    client: "BowFlex UK",
+    industry: "Home fitness",
+    summary:
+      "Shopify Plus storefront for BowFlex UK — treadmills, Max Trainers, bikes and weights, built to carry a global fitness brand in the UK market.",
+    intro:
+      "Shopify Plus development for BowFlex UK — the British storefront for the American home-fitness brand.",
+    services: ["Shopify Plus", "Storefront development", "E-commerce"],
+    technologies: ["Shopify Plus", "Liquid", "Custom sections", "Product merchandising"],
+    liveUrl: "https://bowflex.co.uk/",
+    featured: true,
+    category: "shopify",
+    hero: {
+      kind: "image",
+      src: "/images/projects/bowflex-uk-1.jpg",
+      alt: "BowFlex UK treadmill console with Apple Watch pairing",
+    },
+    gallery: [],
+    overview:
+      "BowFlex UK is the official UK store for BowFlex home fitness — treadmills, Max Trainers, indoor cycles, adjustable weights and accessories. We built and support the Shopify Plus storefront that sells the range into the British market, with a structure built for product discovery, comparison and conversion.",
+    challenge:
+      "A global fitness brand needed a UK store that could hold a dense catalogue of high-ticket equipment without losing clarity — sale periods, free shipping, and a path from browse to checkout that feels as considered as the machines.",
+    solution:
+      "A Shopify Plus storefront organised around the core ranges, with merchandising that can flex for seasonal offers while keeping product comparison and the purchase journey sharp.",
+    development:
+      "Theme and section work on Shopify Plus, catalogue merchandising, and storefront development tailored to a high-consideration fitness retailer.",
+  },
+  {
     slug: "golden-age-of-tennis",
     title: "Golden Age of Tennis",
     client: "Golden Age of Tennis",

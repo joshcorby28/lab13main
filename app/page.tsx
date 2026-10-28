@@ -48,11 +48,13 @@ function toWaveProject(project: Project): WaveProject {
       ? `/images/projects/previews/${project.slug}-card.jpg`
       : "",
     cardVideo:
-      project.slug === "maeving"
-        ? "/videos/maeving.mp4"
-        : project.slug === "hylo-athletics"
-          ? "/videos/hylo.mp4"
-          : undefined,
+      project.slug === "bowflex-uk"
+        ? "/videos/bowflex.mp4"
+        : project.slug === "maeving"
+          ? "/videos/maeving.mp4"
+          : project.slug === "hylo-athletics"
+            ? "/videos/hylo.mp4"
+            : undefined,
     frames:
       frames.length > 0
         ? frames
@@ -66,7 +68,10 @@ function toWaveProject(project: Project): WaveProject {
     development: project.development,
     results: project.results,
     quote: project.quote,
-    plus: project.slug === "hylo-athletics" || project.slug === "maeving",
+    plus:
+      project.slug === "bowflex-uk" ||
+      project.slug === "hylo-athletics" ||
+      project.slug === "maeving",
   };
 }
 
