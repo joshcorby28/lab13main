@@ -77,8 +77,5 @@ function toWaveProject(project: Project): WaveProject {
 
 export default function HomePage() {
   const shopifyProjects = getFeaturedProjects("shopify").map(toWaveProject);
-  const brandingProjects = getFeaturedProjects("branding").map(toWaveProject);
-  return (
-    <WavePortfolio shopifyProjects={shopifyProjects} brandingProjects={brandingProjects} />
-  );
+  return <WavePortfolio shopifyProjects={shopifyProjects} />;
 }

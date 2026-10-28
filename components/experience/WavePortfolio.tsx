@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import * as THREE from "three";
-import { TrackOfTheDay } from "@/components/experience/TrackOfTheDay";
 import { studio } from "@/content/studio";
 import { site } from "@/lib/site";
 
@@ -686,45 +685,36 @@ function portraitKeyFor(name: string): AboutPortraitKey | null {
   return null;
 }
 
-type PortfolioTrack = "shopify" | "branding";
-
 export function WavePortfolio({
   shopifyProjects,
-  brandingProjects,
 }: {
   shopifyProjects: WaveProject[];
-  brandingProjects: WaveProject[];
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const openRef = useRef<number | null>(null);
   const nudgeRef = useRef<(direction: number) => void>(() => {});
-  const [track, setTrack] = useState<PortfolioTrack>("shopify");
-  const projects = track === "shopify" ? shopifyProjects : brandingProjects;
+  const projects = shopifyProjects;
   const [active, setActive] = useState<number | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [aboutPortrait, setAboutPortrait] = useState<AboutPortraitKey | null>(null);
   const [aboutHover, setAboutHover] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [popupScroll, setPopupScroll] = useState(0);
-  const [trackPulse, setTrackPulse] = useState<"idle" | "out" | "in">("idle");
-  const [trackRipple, setTrackRipple] = useState<{
-    x: number;
-    y: number;
-    key: number;
-  } | null>(null);
   const aboutOpenRef = useRef(aboutOpen);
   const closeRef = useRef<HTMLButtonElement>(null);
   const aboutCloseRef = useRef<HTMLButtonElement>(null);
+  const contactCloseRef = useRef<HTMLButtonElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const projectBulgeId = useId().replace(/:/g, "");
   const aboutHoverRef = useRef(false);
-  const pendingTrackRef = useRef<PortfolioTrack | null>(null);
+  const pendingTrackRef = useRef<null>(null);
   const transitionRef = useRef<{ phase: "idle" | "out" | "in"; t: number }>({
     phase: "idle",
     t: 0,
   });
-  aboutOpenRef.current = aboutOpen;
+  aboutOpenRef.current = aboutOpen || contactOpen;
   aboutHoverRef.current = aboutHover;
 
   const closeAbout = () => {
@@ -732,52 +722,14 @@ export function WavePortfolio({
     setAboutOpen(false);
   };
 
-  const switchTrack = (next: PortfolioTrack, event: MouseEvent<HTMLButtonElement>) => {
-    if (next === track || transitionRef.current.phase !== "idle" || aboutOpen) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setActive(null);
-    if (reduce) {
-      setTrack(next);
-      return;
-    }
-    const root = rootRef.current;
-    const rect = root?.getBoundingClientRect();
-    pendingTrackRef.current = next;
-    transitionRef.current = { phase: "out", t: 0 };
-    setTrackPulse("out");
-    setTrackRipple({
-      x: rect ? event.clientX - rect.left : (root?.clientWidth ?? 0) / 2,
-      y: rect ? event.clientY - rect.top : (root?.clientHeight ?? 0) * 0.12,
-      key: Date.now(),
-    });
+  const closeContact = () => {
+    setContactOpen(false);
+    setAboutHover(false);
   };
-
 
   useEffect(() => {
     if (active === null) setPopupScroll(0);
   }, [active]);
-
-  // Mobile has no WebGL tick, so drive the track swap on timers instead.
-  useEffect(() => {
-    if (trackPulse !== "out" || !mobile) return;
-    const next = pendingTrackRef.current;
-    if (!next) return;
-    const swapTimer = window.setTimeout(() => {
-      pendingTrackRef.current = null;
-      transitionRef.current = { phase: "in", t: 0 };
-      setTrackPulse("in");
-      setTrack(next);
-    }, 420);
-    const settleTimer = window.setTimeout(() => {
-      transitionRef.current = { phase: "idle", t: 0 };
-      setTrackPulse("idle");
-      setTrackRipple(null);
-    }, 980);
-    return () => {
-      window.clearTimeout(swapTimer);
-      window.clearTimeout(settleTimer);
-    };
-  }, [trackPulse, mobile]);
 
   useEffect(() => {
     const media = window.matchMedia(`(max-width: ${MOBILE_MAX - 1}px)`);
@@ -792,13 +744,15 @@ export function WavePortfolio({
   }, [active]);
 
   useEffect(() => {
-    if (active === null && !aboutOpen) return;
+    if (active === null && !aboutOpen && !contactOpen) return;
     if (aboutOpen) aboutCloseRef.current?.focus();
+    else if (contactOpen) contactCloseRef.current?.focus();
     else closeRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         if (active !== null) setActive(null);
         else if (aboutOpen) closeAbout();
+        else if (contactOpen) closeContact();
         return;
       }
       if (active === null || projects.length < 2) return;
@@ -812,7 +766,7 @@ export function WavePortfolio({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active, aboutOpen, projects.length]);
+  }, [active, aboutOpen, contactOpen, projects.length]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -1374,11 +1328,8 @@ export function WavePortfolio({
         swapDim = 1 - Math.min(1, t * 1.35) * 0.78;
         // Swap at the ripple crest so the new set rises out of the wash.
         if (t >= 0.5 && pendingTrackRef.current) {
-          const next = pendingTrackRef.current;
           pendingTrackRef.current = null;
           transitionRef.current = { phase: "in", t: 0 };
-          setTrackPulse("in");
-          setTrack(next);
         }
       } else if (!reduce && transition.phase === "in") {
         transition.t = Math.min(1, transition.t + 0.032);
@@ -1389,8 +1340,6 @@ export function WavePortfolio({
         swapDim = 0.22 + t * 0.78;
         if (t >= 1) {
           transitionRef.current = { phase: "idle", t: 0 };
-          setTrackPulse("idle");
-          setTrackRipple(null);
         }
       }
 
@@ -1505,7 +1454,8 @@ export function WavePortfolio({
   const nextIndex = active === null ? null : (active + 1) % projects.length;
   const prevProject = prevIndex === null ? null : projects[prevIndex];
   const nextProject = nextIndex === null ? null : projects[nextIndex];
-  const overlayOpen = aboutOpen || project !== null;
+  const overlayOpen = aboutOpen || contactOpen || project !== null;
+  const circleOpen = aboutOpen || contactOpen;
   const mobileLoop = mobile ? [...projects, ...projects, ...projects] : projects;
   const goProject = (index: number) => setActive(index);
   const popupBulge = Math.sin(popupScroll * Math.PI * 2);
@@ -1524,13 +1474,7 @@ export function WavePortfolio({
         <>
           <div
             ref={mobileScrollRef}
-            className={`absolute inset-0 z-0 overflow-y-auto overscroll-contain transition-[filter,opacity,transform] duration-500 ease-out ${
-              trackPulse === "out"
-                ? "scale-[1.03] opacity-35 blur-[7px]"
-                : trackPulse === "in"
-                  ? "wave-track-in"
-                  : "scale-100 opacity-100 blur-0"
-            }`}
+            className="absolute inset-0 z-0 overflow-y-auto overscroll-contain scale-100 opacity-100 blur-0"
           >
             <ul className="flex flex-col gap-4 px-5 py-28">
               {mobileLoop.map((item, loopIndex) => {
@@ -1587,56 +1531,25 @@ export function WavePortfolio({
         <>
           <canvas
             ref={canvasRef}
-            className={`absolute inset-0 z-0 h-full w-full transition-[filter,opacity,transform] duration-500 ease-out ${
-              trackPulse === "out"
-                ? "scale-[1.035] opacity-45 blur-[8px] brightness-[0.65]"
-                : trackPulse === "in"
-                  ? "wave-track-in"
-                  : "scale-100 opacity-100 blur-0 brightness-100"
-            }`}
+            className="absolute inset-0 z-0 h-full w-full scale-100 opacity-100 blur-0 brightness-100"
             aria-label="Selected Lab 13 work"
           />
           <div
-            className={`pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.45)_100%)] transition-opacity duration-700 ${aboutOpen ? "opacity-30" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.45)_100%)] transition-opacity duration-700 ${circleOpen ? "opacity-30" : "opacity-100"}`}
           />
           <div
-            className={`pointer-events-none absolute inset-y-0 left-0 z-[2] w-[18%] bg-gradient-to-r from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-y-0 left-0 z-[2] w-[18%] bg-gradient-to-r from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${circleOpen ? "opacity-0" : "opacity-100"}`}
           />
           <div
-            className={`pointer-events-none absolute inset-y-0 right-0 z-[2] w-[18%] bg-gradient-to-l from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${aboutOpen ? "opacity-0" : "opacity-100"}`}
+            className={`pointer-events-none absolute inset-y-0 right-0 z-[2] w-[18%] bg-gradient-to-l from-black via-black/80 to-transparent transition-opacity duration-700 sm:w-[22%] ${circleOpen ? "opacity-0" : "opacity-100"}`}
           />
         </>
       )}
 
-      {trackRipple ? (
-        <div
-          key={trackRipple.key}
-          className="pointer-events-none absolute inset-0 z-[25] overflow-hidden"
-          aria-hidden
-        >
-          <span
-            className="wave-track-bloom"
-            style={{ left: trackRipple.x, top: trackRipple.y }}
-          />
-          <span
-            className="wave-track-ring"
-            style={{ left: trackRipple.x, top: trackRipple.y, animationDelay: "0ms" }}
-          />
-          <span
-            className="wave-track-ring wave-track-ring--mid"
-            style={{ left: trackRipple.x, top: trackRipple.y, animationDelay: "70ms" }}
-          />
-          <span
-            className="wave-track-ring wave-track-ring--soft"
-            style={{ left: trackRipple.x, top: trackRipple.y, animationDelay: "140ms" }}
-          />
-        </div>
-      ) : null}
-
       <div
         data-chrome
         className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-6 py-6 sm:px-10 ${
-          aboutOpen ? "z-[60]" : "z-40"
+          circleOpen ? "z-[60]" : "z-40"
         }`}
       >
         <Link
@@ -1646,40 +1559,11 @@ export function WavePortfolio({
           {site.shortName}
         </Link>
         {!overlayOpen ? (
-          <nav
-            aria-label="Portfolio"
-            className="pointer-events-auto absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 items-center gap-3"
-          >
-            <button
-              type="button"
-              onClick={(event) => switchTrack("shopify", event)}
-              className={`wave-chrome px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase transition-colors ${
-                track === "shopify" ? "text-white" : "text-white/45 hover:text-white/75"
-              }`}
-              aria-current={track === "shopify" ? "page" : undefined}
-            >
-              Shopify
-            </button>
-            <span aria-hidden className="text-white/25">
-              |
-            </span>
-            <button
-              type="button"
-              onClick={(event) => switchTrack("branding", event)}
-              className={`wave-chrome px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase transition-colors ${
-                track === "branding" ? "text-white" : "text-white/45 hover:text-white/75"
-              }`}
-              aria-current={track === "branding" ? "page" : undefined}
-            >
-              Branding
-            </button>
-          </nav>
-        ) : null}
-        {!overlayOpen ? (
           <button
             type="button"
             onClick={() => {
               setAboutPortrait(null);
+              setContactOpen(false);
               setAboutOpen(true);
             }}
             className="wave-chrome pointer-events-auto relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
@@ -1697,12 +1581,19 @@ export function WavePortfolio({
           className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex items-end justify-between gap-4 px-6 py-6 sm:px-10"
         >
           <p className="wave-chrome px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/55">
-            {track === "branding" ? "We know Branding" : "We know Shopify"}
+            We know Shopify
           </p>
-          <TrackOfTheDay className="absolute bottom-6 left-1/2 z-50 -translate-x-1/2 sm:bottom-8" />
-          <p className="wave-chrome relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80">
+          <button
+            type="button"
+            onClick={() => {
+              setAboutPortrait(null);
+              setAboutOpen(false);
+              setContactOpen(true);
+            }}
+            className="wave-chrome pointer-events-auto relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
+          >
             Contact
-          </p>
+          </button>
         </div>
       ) : null}
 
@@ -2018,6 +1909,139 @@ export function WavePortfolio({
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {contactOpen ? (
+          <motion.div
+            className="absolute inset-0 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45 }}
+          >
+            <button
+              type="button"
+              aria-label="Close contact"
+              className="absolute inset-0 cursor-default bg-black/35"
+              onClick={closeContact}
+            />
+
+            <button
+              ref={contactCloseRef}
+              type="button"
+              data-chrome
+              onClick={closeContact}
+              className="wave-chrome absolute top-6 right-6 z-[60] px-2 py-2 font-normal tracking-[0.22em] uppercase text-white/85 sm:top-8 sm:right-10"
+            >
+              Close
+            </button>
+
+            {mobile ? (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="contact-title"
+                data-about-dialog
+                data-chrome
+                className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                initial={{ scale: 0.72, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.86, opacity: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div
+                  className="pointer-events-auto relative aspect-square w-[min(94vw,78dvh)]"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background:
+                        "conic-gradient(from 200deg, #f7f3ee, #9eb4c8 10%, #e8d9c8 18%, #c4a8d4 28%, #f0ebe4 38%, #6a7a8a 48%, #dce8f0 58%, #b89878 68%, #eef2f6 78%, #8a9aac 88%, #f7f3ee)",
+                      boxShadow:
+                        "0 18px 50px rgba(0,0,0,0.55), inset 0 1px 1px rgba(255,255,255,0.55)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-[1.5%] rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 30% 22%, rgba(255,255,255,0.7), transparent 38%), radial-gradient(circle at 78% 72%, rgba(120,160,220,0.25), transparent 40%), radial-gradient(circle at 55% 55%, transparent 55%, rgba(0,0,0,0.35) 100%)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-[7%] rounded-full"
+                    style={{
+                      background:
+                        "conic-gradient(from 30deg, #1a1816, #5a5550 20%, #0c0b0a 40%, #7a746c 60%, #121110 80%, #1a1816)",
+                      boxShadow: "inset 0 0 22px rgba(0,0,0,0.85)",
+                    }}
+                  />
+                  <div className="absolute inset-[10.5%] flex flex-col items-center justify-center overflow-hidden rounded-full bg-[#050505] px-[12%] text-center shadow-[inset_0_0_60px_rgba(0,0,0,1)]">
+                    <h2 id="contact-title" className="text-[0.95rem] leading-[1.5] tracking-[-0.015em] text-white/92">
+                      Get in touch
+                    </h2>
+                    <a
+                      href={`mailto:${site.email}`}
+                      className="mt-6 text-[10px] tracking-[0.18em] uppercase text-white/70 underline underline-offset-[5px]"
+                    >
+                      {site.email}
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="contact-title"
+                data-about-dialog
+                data-chrome
+                onPointerEnter={() => setAboutHover(true)}
+                onPointerLeave={() => setAboutHover(false)}
+                className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                initial={{ scale: 0.35, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.72, opacity: 0 }}
+                transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div
+                  className="pointer-events-auto relative flex aspect-square w-[min(64vw,64dvh)] flex-col items-center justify-center overflow-visible sm:w-[min(58vw,58dvh)]"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute left-1/2 top-1/2 z-0 aspect-square w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(circle, #000 0%, #000 64%, rgba(0,0,0,0.94) 74%, rgba(0,0,0,0) 100%)",
+                      boxShadow:
+                        "0 0 80px rgba(0,0,0,0.95), inset 0 0 50px rgba(0,0,0,1)",
+                    }}
+                  />
+                  <div className="relative z-10 flex aspect-square w-[74%] flex-col items-center justify-center overflow-hidden rounded-full px-8 text-center text-white">
+                    <h2
+                      id="contact-title"
+                      className="max-w-[20ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90"
+                    >
+                      Get in touch
+                    </h2>
+                    <a
+                      href={`mailto:${site.email}`}
+                      className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
+                    >
+                      {site.email}
+                    </a>
                   </div>
                 </div>
               </motion.div>
