@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import * as THREE from "three";
 import { studio } from "@/content/studio";
@@ -819,7 +819,7 @@ function ViewSwitch({
   onChange,
 }: {
   view: "wave" | "grid";
-  onChange: (next: "wave" | "grid") => void;
+  onChange: (next: "wave" | "grid", event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
     <div
@@ -832,7 +832,7 @@ function ViewSwitch({
         role="tab"
         aria-label="Wave view"
         aria-selected={view === "wave"}
-        onClick={() => onChange("wave")}
+        onClick={(event) => onChange("wave", event)}
         className={`grid size-10 place-items-center transition-colors ${
           view === "wave" ? "text-white" : "text-white/30 hover:text-white/70"
         }`}
@@ -851,7 +851,7 @@ function ViewSwitch({
         role="tab"
         aria-label="Grid view"
         aria-selected={view === "grid"}
-        onClick={() => onChange("grid")}
+        onClick={(event) => onChange("grid", event)}
         className={`grid size-10 place-items-center transition-colors ${
           view === "grid" ? "text-white" : "text-white/30 hover:text-white/70"
         }`}
@@ -885,6 +885,12 @@ export function WavePortfolio({
   const [mobile, setMobile] = useState(false);
   const [view, setView] = useState<"wave" | "grid">("wave");
   const [popupScroll, setPopupScroll] = useState(0);
+  const [trackPulse, setTrackPulse] = useState<"idle" | "out" | "in">("idle");
+  const [trackRipple, setTrackRipple] = useState<{
+    x: number;
+    y: number;
+    key: number;
+  } | null>(null);
   const aboutOpenRef = useRef(aboutOpen);
   const closeRef = useRef<HTMLButtonElement>(null);
   const aboutCloseRef = useRef<HTMLButtonElement>(null);
@@ -892,7 +898,7 @@ export function WavePortfolio({
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const projectBulgeId = useId().replace(/:/g, "");
   const aboutHoverRef = useRef(false);
-  const pendingTrackRef = useRef<null>(null);
+  const pendingViewRef = useRef<"wave" | "grid" | null>(null);
   const transitionRef = useRef<{ phase: "idle" | "out" | "in"; t: number }>({
     phase: "idle",
     t: 0,
@@ -927,10 +933,58 @@ export function WavePortfolio({
     if (saved === "grid" || saved === "wave") setView(saved);
   }, []);
 
-  const changeView = (next: "wave" | "grid") => {
+  const applyView = (next: "wave" | "grid") => {
     setView(next);
     window.localStorage.setItem("lab13-portfolio-view", next);
   };
+
+  const changeView = (next: "wave" | "grid", event: MouseEvent<HTMLButtonElement>) => {
+    if (next === view || transitionRef.current.phase !== "idle" || aboutOpen || contactOpen) {
+      return;
+    }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setActive(null);
+    if (reduce) {
+      applyView(next);
+      return;
+    }
+    const root = rootRef.current;
+    const rect = root?.getBoundingClientRect();
+    pendingViewRef.current = next;
+    transitionRef.current = { phase: "out", t: 0 };
+    setTrackPulse("out");
+    setTrackRipple({
+      x: rect ? event.clientX - rect.left : (root?.clientWidth ?? 0) / 2,
+      y: rect ? event.clientY - rect.top : (root?.clientHeight ?? 0) * 0.12,
+      key: Date.now(),
+    });
+  };
+
+  useEffect(() => {
+    if (trackPulse !== "out") return;
+    const swapWithTimer = mobile || view === "grid";
+    const swapTimer = swapWithTimer
+      ? window.setTimeout(() => {
+          const next = pendingViewRef.current;
+          if (!next) return;
+          pendingViewRef.current = null;
+          transitionRef.current = { phase: "in", t: 0 };
+          setTrackPulse("in");
+          applyView(next);
+        }, 420)
+      : 0;
+    const settleTimer = window.setTimeout(() => {
+      transitionRef.current = { phase: "idle", t: 0 };
+      setTrackPulse("idle");
+      setTrackRipple(null);
+    }, 980);
+    return () => {
+      if (transitionRef.current.phase === "out") {
+        window.clearTimeout(swapTimer);
+        window.clearTimeout(settleTimer);
+      }
+    };
+  }, [trackPulse, mobile, view]);
 
   useEffect(() => {
     openRef.current = active;
@@ -1520,9 +1574,12 @@ export function WavePortfolio({
         swapTime = t * 1.55;
         swapDim = 1 - Math.min(1, t * 1.35) * 0.78;
         // Swap at the ripple crest so the new set rises out of the wash.
-        if (t >= 0.5 && pendingTrackRef.current) {
-          pendingTrackRef.current = null;
+        if (t >= 0.5 && pendingViewRef.current) {
+          const next = pendingViewRef.current;
+          pendingViewRef.current = null;
           transitionRef.current = { phase: "in", t: 0 };
+          setTrackPulse("in");
+          applyView(next);
         }
       } else if (!reduce && transition.phase === "in") {
         transition.t = Math.min(1, transition.t + 0.032);
@@ -1533,6 +1590,8 @@ export function WavePortfolio({
         swapDim = 0.22 + t * 0.78;
         if (t >= 1) {
           transitionRef.current = { phase: "idle", t: 0 };
+          setTrackPulse("idle");
+          setTrackRipple(null);
         }
       }
 
@@ -1653,6 +1712,18 @@ export function WavePortfolio({
   const goProject = (index: number) => setActive(index);
   const popupBulge = Math.sin(popupScroll * Math.PI * 2);
   const popupBulgePath = bulgePanelPath(popupBulge);
+  const viewPulseClass =
+    trackPulse === "out"
+      ? "scale-[1.03] opacity-35 blur-[7px]"
+      : trackPulse === "in"
+        ? "wave-track-in"
+        : "scale-100 opacity-100 blur-0";
+  const canvasPulseClass =
+    trackPulse === "out"
+      ? "scale-[1.035] opacity-45 blur-[8px] brightness-[0.65]"
+      : trackPulse === "in"
+        ? "wave-track-in"
+        : "scale-100 opacity-100 blur-0 brightness-100";
 
   return (
     <div
@@ -1665,7 +1736,7 @@ export function WavePortfolio({
     >
       {view === "grid" ? (
         <>
-          <div className="hide-scrollbar absolute inset-0 z-0 overflow-y-auto overscroll-contain">
+          <div className={`hide-scrollbar absolute inset-0 z-0 overflow-y-auto overscroll-contain transition-[filter,opacity,transform] duration-500 ease-out ${viewPulseClass}`}>
             <ul className="grid w-full grid-cols-1 items-start gap-4 px-5 pt-28 pb-28 sm:grid-cols-2 sm:gap-5 sm:px-6 lg:grid-cols-3 lg:px-8">
               {projects.map((item, index) => (
                 <li key={item.slug} className="min-w-0">
@@ -1686,7 +1757,7 @@ export function WavePortfolio({
         <>
           <div
             ref={mobileScrollRef}
-            className="absolute inset-0 z-0 overflow-y-auto overscroll-contain scale-100 opacity-100 blur-0"
+            className={`absolute inset-0 z-0 overflow-y-auto overscroll-contain transition-[filter,opacity,transform] duration-500 ease-out ${viewPulseClass}`}
           >
             <ul className="flex flex-col gap-4 px-5 py-28">
               {mobileLoop.map((item, loopIndex) => {
@@ -1710,7 +1781,7 @@ export function WavePortfolio({
         <>
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 z-0 h-full w-full scale-100 opacity-100 blur-0 brightness-100"
+            className={`absolute inset-0 z-0 h-full w-full transition-[filter,opacity,transform] duration-500 ease-out ${canvasPulseClass}`}
             aria-label="Selected Lab 13 work"
           />
           <div
@@ -1724,6 +1795,31 @@ export function WavePortfolio({
           />
         </>
       )}
+
+      {trackRipple ? (
+        <div
+          key={trackRipple.key}
+          className="pointer-events-none absolute inset-0 z-[25] overflow-hidden"
+          aria-hidden
+        >
+          <span
+            className="wave-track-bloom"
+            style={{ left: trackRipple.x, top: trackRipple.y }}
+          />
+          <span
+            className="wave-track-ring"
+            style={{ left: trackRipple.x, top: trackRipple.y, animationDelay: "0ms" }}
+          />
+          <span
+            className="wave-track-ring wave-track-ring--mid"
+            style={{ left: trackRipple.x, top: trackRipple.y, animationDelay: "70ms" }}
+          />
+          <span
+            className="wave-track-ring wave-track-ring--soft"
+            style={{ left: trackRipple.x, top: trackRipple.y, animationDelay: "140ms" }}
+          />
+        </div>
+      ) : null}
 
       <div
         data-chrome
