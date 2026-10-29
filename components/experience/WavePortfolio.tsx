@@ -535,8 +535,10 @@ function RippleFrame({ src }: { src: string }) {
 
 function LiveSitePreview({
   url,
+  shot,
 }: {
   url: string;
+  shot?: string;
 }) {
   const host = (() => {
     try {
@@ -566,9 +568,20 @@ function LiveSitePreview({
           Open
         </a>
       </div>
-      <div className="grid min-h-0 flex-1 place-items-center bg-white px-6 text-center text-[12px] tracking-[0.14em] uppercase text-black/35">
-        Preview coming soon
-      </div>
+      {shot ? (
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white [-webkit-overflow-scrolling:touch]">
+          <img
+            src={shot}
+            alt={`${host} preview`}
+            className="block w-full"
+            draggable={false}
+          />
+        </div>
+      ) : (
+        <div className="grid min-h-0 flex-1 place-items-center bg-white px-6 text-center text-[12px] tracking-[0.14em] uppercase text-black/35">
+          Preview coming soon
+        </div>
+      )}
     </div>
   );
 }
@@ -2111,7 +2124,7 @@ export function WavePortfolio({
                   {project.liveUrl ? (
                     <div className="px-4 pb-4">
                       <div className="h-[min(52dvh,28rem)]">
-                        <LiveSitePreview url={project.liveUrl} />
+                        <LiveSitePreview url={project.liveUrl} shot={project.liveShot} />
                       </div>
                     </div>
                   ) : project.frames.length > 0 ? (
@@ -2254,7 +2267,7 @@ export function WavePortfolio({
                         }
                       >
                         {project.liveUrl ? (
-                          <LiveSitePreview url={project.liveUrl} />
+                          <LiveSitePreview url={project.liveUrl} shot={project.liveShot} />
                         ) : (
                           <div className="flex flex-col gap-4 md:gap-5">
                             {project.frames.map((src) => (

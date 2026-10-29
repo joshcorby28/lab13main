@@ -11,6 +11,7 @@ services:
   - Storefront development
   - E-commerce
 liveUrl: https://bowflex.co.uk/
+liveShot: bowflex-uk-live.jpg
 featured: true
 order: 0
 tone: "#111111"

@@ -14,6 +14,7 @@ export type Project = {
   services: string[]
   technologies: string[]
   liveUrl?: string
+  liveShot?: string
   featured: boolean
   category: ProjectCategory
   hero: Media
@@ -39,6 +40,7 @@ export const projects: Project[] = [
     services: ["Shopify Plus", "Storefront development", "E-commerce"],
     technologies: ["Shopify Plus", "Liquid", "Custom sections", "Product merchandising"],
     liveUrl: "https://bowflex.co.uk/",
+    liveShot: "/images/projects/previews/bowflex-uk-live.jpg",
     featured: true,
     category: "shopify",
     hero: {

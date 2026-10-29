@@ -41,9 +41,7 @@ function toWaveProject(project: Project): WaveProject {
     services: project.services,
     technologies: project.technologies,
     liveUrl: project.liveUrl,
-    liveShot: project.liveUrl
-      ? `/images/projects/previews/${project.slug}-full.jpg`
-      : undefined,
+    liveShot: project.liveShot,
     card: hasPreviewCard
       ? `/images/projects/previews/${project.slug}-card.jpg`
       : "",
