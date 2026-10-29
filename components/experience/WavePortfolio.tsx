@@ -698,6 +698,110 @@ function portraitKeyFor(name: string): AboutPortraitKey | null {
   return null;
 }
 
+function ProjectCard({
+  item,
+  onOpen,
+  cursor,
+}: {
+  item: WaveProject;
+  onOpen: () => void;
+  cursor?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group relative block w-full overflow-hidden rounded-[22px] text-left"
+      style={{ background: item.tone }}
+      data-cursor={cursor}
+    >
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
+        {item.cardVideo ? (
+          <video
+            src={item.cardVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+          />
+        ) : item.card ? (
+          <img
+            src={item.card}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+          />
+        ) : null}
+        {item.plus ? (
+          <span className="pointer-events-none absolute top-3 left-3 inline-flex items-center rounded-full bg-white px-2.5 py-1.5">
+            <img
+              src="/images/brands/shopify-plus.png"
+              alt="Shopify Plus"
+              className="block h-2.5! w-auto! max-h-2.5 max-w-[3.25rem]"
+            />
+          </span>
+        ) : null}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-5 pt-16 pb-5">
+          <p className="text-[1.35rem] leading-none tracking-[-0.03em]">{item.title}</p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function ViewSwitch({
+  view,
+  onChange,
+}: {
+  view: "wave" | "grid";
+  onChange: (next: "wave" | "grid") => void;
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Layout"
+      className="pointer-events-auto relative z-40 flex items-center"
+    >
+      <button
+        type="button"
+        role="tab"
+        aria-label="Wave view"
+        aria-selected={view === "wave"}
+        onClick={() => onChange("wave")}
+        className={`grid size-10 place-items-center transition-colors ${
+          view === "wave" ? "text-white" : "text-white/30 hover:text-white/70"
+        }`}
+      >
+        <svg width="22" height="14" viewBox="0 0 22 14" fill="none" aria-hidden>
+          <path
+            d="M1 7c2.4-5.2 4.8-5.2 7.2 0s4.8 5.2 7.2 0 4.8-5.2 7.2 0"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-label="Grid view"
+        aria-selected={view === "grid"}
+        onClick={() => onChange("grid")}
+        className={`grid size-10 place-items-center transition-colors ${
+          view === "grid" ? "text-white" : "text-white/30 hover:text-white/70"
+        }`}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <rect x="1.2" y="1.2" width="5.4" height="5.4" rx="1" stroke="currentColor" strokeWidth="1.4" />
+          <rect x="9.4" y="1.2" width="5.4" height="5.4" rx="1" stroke="currentColor" strokeWidth="1.4" />
+          <rect x="1.2" y="9.4" width="5.4" height="5.4" rx="1" stroke="currentColor" strokeWidth="1.4" />
+          <rect x="9.4" y="9.4" width="5.4" height="5.4" rx="1" stroke="currentColor" strokeWidth="1.4" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export function WavePortfolio({
   shopifyProjects,
 }: {
@@ -714,6 +818,7 @@ export function WavePortfolio({
   const [aboutPortrait, setAboutPortrait] = useState<AboutPortraitKey | null>(null);
   const [aboutHover, setAboutHover] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [view, setView] = useState<"wave" | "grid">("wave");
   const [popupScroll, setPopupScroll] = useState(0);
   const aboutOpenRef = useRef(aboutOpen);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -753,6 +858,16 @@ export function WavePortfolio({
   }, []);
 
   useEffect(() => {
+    const saved = window.localStorage.getItem("lab13-portfolio-view");
+    if (saved === "grid" || saved === "wave") setView(saved);
+  }, []);
+
+  const changeView = (next: "wave" | "grid") => {
+    setView(next);
+    window.localStorage.setItem("lab13-portfolio-view", next);
+  };
+
+  useEffect(() => {
     openRef.current = active;
   }, [active]);
 
@@ -784,7 +899,7 @@ export function WavePortfolio({
   useEffect(() => {
     const root = rootRef.current;
     const canvas = canvasRef.current;
-    if (mobile || !root || !canvas || projects.length === 0) return;
+    if (mobile || view !== "wave" || !root || !canvas || projects.length === 0) return;
 
     const previousHtml = document.documentElement.style.background;
     const previousBody = document.body.style.background;
@@ -1423,10 +1538,10 @@ export function WavePortfolio({
       document.documentElement.style.background = previousHtml;
       document.body.style.background = previousBody;
     };
-  }, [projects, mobile]);
+  }, [projects, mobile, view]);
 
   useEffect(() => {
-    if (!mobile) return;
+    if (!mobile && view !== "grid") return;
     const previousHtml = document.documentElement.style.background;
     const previousBody = document.body.style.background;
     document.documentElement.style.background = "#000";
@@ -1435,10 +1550,10 @@ export function WavePortfolio({
       document.documentElement.style.background = previousHtml;
       document.body.style.background = previousBody;
     };
-  }, [mobile]);
+  }, [mobile, view]);
 
   useEffect(() => {
-    if (!mobile) return;
+    if (!mobile || view !== "wave") return;
     const el = mobileScrollRef.current;
     if (!el || projects.length === 0) return;
 
@@ -1460,7 +1575,7 @@ export function WavePortfolio({
     requestAnimationFrame(jumpToMiddle);
     el.addEventListener("scroll", syncLoop, { passive: true });
     return () => el.removeEventListener("scroll", syncLoop);
-  }, [mobile, projects.length]);
+  }, [mobile, projects.length, view]);
 
   const project = active === null ? null : projects[active];
   const prevIndex = active === null ? null : (active - 1 + projects.length) % projects.length;
@@ -1483,7 +1598,25 @@ export function WavePortfolio({
           "radial-gradient(ellipse 90% 70% at 20% 15%, rgba(184,169,157,0.14), transparent 55%), radial-gradient(ellipse 80% 60% at 85% 80%, rgba(143,168,255,0.08), transparent 50%), #0a0908",
       }}
     >
-      {mobile ? (
+      {view === "grid" ? (
+        <>
+          <div className="hide-scrollbar absolute inset-0 z-0 overflow-y-auto overscroll-contain">
+            <ul className="mx-auto grid max-w-[1480px] grid-cols-1 gap-4 px-5 pt-28 pb-28 sm:grid-cols-2 sm:gap-5 sm:px-8 lg:grid-cols-3 lg:px-10">
+              {projects.map((item, index) => (
+                <li key={item.slug}>
+                  <ProjectCard
+                    item={item}
+                    onOpen={() => setActive(index)}
+                    cursor={overlayOpen ? undefined : "Open"}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-28 bg-gradient-to-b from-black via-black/85 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-28 bg-gradient-to-t from-black via-black/85 to-transparent" />
+        </>
+      ) : mobile ? (
         <>
           <div
             ref={mobileScrollRef}
@@ -1494,44 +1627,11 @@ export function WavePortfolio({
                 const index = loopIndex % projects.length;
                 return (
                   <li key={`${item.slug}-${loopIndex}`}>
-                    <button
-                      type="button"
-                      onClick={() => setActive(index)}
-                      className="relative block w-full overflow-hidden rounded-[22px] text-left"
-                      style={{ background: item.tone }}
-                      data-cursor={overlayOpen ? undefined : "Open"}
-                    >
-                      <div className="relative aspect-[16/10] w-full">
-                        {item.cardVideo ? (
-                          <video
-                            src={item.cardVideo}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            className="absolute inset-0 h-full w-full object-cover"
-                          />
-                        ) : item.card ? (
-                          <img
-                            src={item.card}
-                            alt=""
-                            className="absolute inset-0 h-full w-full object-cover object-top"
-                          />
-                        ) : null}
-                        {item.plus ? (
-                          <span className="pointer-events-none absolute top-3 left-3 inline-flex items-center rounded-full bg-white px-2.5 py-1.5">
-                            <img
-                              src="/images/brands/shopify-plus.png"
-                              alt="Shopify Plus"
-                              className="block h-2.5! w-auto! max-h-2.5 max-w-[3.25rem]"
-                            />
-                          </span>
-                        ) : null}
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 pt-16 pb-5">
-                          <p className="text-[1.35rem] leading-none tracking-[-0.03em]">{item.title}</p>
-                        </div>
-                      </div>
-                    </button>
+                    <ProjectCard
+                      item={item}
+                      onOpen={() => setActive(index)}
+                      cursor={overlayOpen ? undefined : "Open"}
+                    />
                   </li>
                 );
               })}
@@ -1561,16 +1661,21 @@ export function WavePortfolio({
 
       <div
         data-chrome
-        className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-6 py-6 sm:px-10 ${
+        className={`pointer-events-none absolute inset-x-0 top-0 grid grid-cols-[1fr_auto_1fr] items-center px-6 py-6 sm:px-10 ${
           circleOpen ? "z-[60]" : "z-40"
         }`}
       >
         <Link
           href="/"
-          className="wave-chrome pointer-events-auto relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase"
+          className="wave-chrome pointer-events-auto relative z-40 justify-self-start px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase"
         >
           {site.shortName}
         </Link>
+        {!overlayOpen ? (
+          <ViewSwitch view={view} onChange={changeView} />
+        ) : (
+          <span aria-hidden />
+        )}
         {!overlayOpen ? (
           <button
             type="button"
@@ -1579,12 +1684,12 @@ export function WavePortfolio({
               setContactOpen(false);
               setAboutOpen(true);
             }}
-            className="wave-chrome pointer-events-auto relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
+            className="wave-chrome pointer-events-auto relative z-40 justify-self-end px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
           >
             About
           </button>
         ) : (
-          <span aria-hidden className="px-2 py-2" />
+          <span aria-hidden className="justify-self-end px-2 py-2" />
         )}
       </div>
 
