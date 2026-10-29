@@ -928,16 +928,6 @@ export function WavePortfolio({
     return () => media.removeEventListener("change", apply);
   }, []);
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem("lab13-portfolio-view");
-    if (saved === "grid" || saved === "wave") setView(saved);
-  }, []);
-
-  const applyView = (next: "wave" | "grid") => {
-    setView(next);
-    window.localStorage.setItem("lab13-portfolio-view", next);
-  };
-
   const changeView = (next: "wave" | "grid", event: MouseEvent<HTMLButtonElement>) => {
     if (next === view || transitionRef.current.phase !== "idle" || aboutOpen || contactOpen) {
       return;
@@ -945,7 +935,7 @@ export function WavePortfolio({
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setActive(null);
     if (reduce) {
-      applyView(next);
+      setView(next);
       return;
     }
     const root = rootRef.current;
@@ -970,7 +960,7 @@ export function WavePortfolio({
           pendingViewRef.current = null;
           transitionRef.current = { phase: "in", t: 0 };
           setTrackPulse("in");
-          applyView(next);
+          setView(next);
         }, 420)
       : 0;
     const settleTimer = window.setTimeout(() => {
@@ -1579,7 +1569,7 @@ export function WavePortfolio({
           pendingViewRef.current = null;
           transitionRef.current = { phase: "in", t: 0 };
           setTrackPulse("in");
-          applyView(next);
+          setView(next);
         }
       } else if (!reduce && transition.phase === "in") {
         transition.t = Math.min(1, transition.t + 0.032);
