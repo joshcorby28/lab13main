@@ -15,7 +15,7 @@ export function pageMetadata({
   const fullTitle = title === site.name ? title : `${title} — ${site.name}`;
 
   return {
-    title: path === "/" ? { absolute: `${site.name} — ${site.tagline}` } : title,
+    title: path === "/" ? { absolute: `${site.name} — Shopify Plus studio in Exeter` } : title,
     description,
     alternates: { canonical: url },
     openGraph: {
@@ -43,9 +43,11 @@ export function organizationJsonLd() {
     url: site.url,
     email: site.email,
     description: site.description,
-    areaServed: "Worldwide",
+    areaServed: ["GB", "Worldwide"],
     address: {
       "@type": "PostalAddress",
+      addressLocality: "Exeter",
+      addressRegion: "Devon",
       addressCountry: "GB",
     },
     sameAs: [site.url],

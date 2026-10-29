@@ -7,9 +7,9 @@ export const site = {
   email: "info@lab-13.co.uk",
   locale: "en_GB",
   description:
-    "A small family-run studio designing and developing thoughtfully crafted Shopify Plus stores, custom Shopify apps, migrations and retainers.",
-  tagline: "Thoughtfully crafted Shopify Plus stores & apps.",
-  location: "United Kingdom",
+    "Family-run Shopify Plus studio in Exeter. We design and build Shopify stores, migrations and custom apps for brands in the UK and worldwide.",
+  tagline: "Shopify Plus stores and custom apps.",
+  location: "Exeter, United Kingdom",
   acceptingClients: true,
 } as const;
 

@@ -1,11 +1,11 @@
 import { WavePortfolio, type WaveProject } from "@/components/experience/WavePortfolio";
 import { getFeaturedProjects, type Project } from "@/content/projects";
 import { pageMetadata } from "@/lib/seo";
+import { site } from "@/lib/site";
 
 export const metadata = pageMetadata({
   title: "Lab 13",
-  description:
-    "A small family-run studio designing and developing thoughtfully crafted Shopify Plus stores, custom apps and migrations.",
+  description: site.description,
   path: "/",
 });
 

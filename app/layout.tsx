@@ -31,7 +31,7 @@ const mono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Thoughtfully crafted Shopify Plus stores & apps`,
+    default: `${site.name} — Shopify Plus studio in Exeter`,
     template: `%s — ${site.name}`,
   },
   description: site.description,
