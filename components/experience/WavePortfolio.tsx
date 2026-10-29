@@ -264,6 +264,7 @@ const rippleVert = /* glsl */ `
   uniform float uRippleTime;
   uniform float uHover;
   uniform float uAspect;
+  uniform float uIntensity;
 
   void main() {
     vUv = uv;
@@ -277,7 +278,7 @@ const rippleVert = /* glsl */ `
       sin(22.0 * dist - uRippleTime * 4.8) * 0.65 +
       sin(11.0 * dist - uRippleTime * 2.8) * 0.35;
 
-    float ripple = ring * exp(-3.0 * dist) * uHover * 0.32;
+    float ripple = ring * exp(-3.0 * dist) * uHover * 0.32 * uIntensity;
 
     // Very light container nudge — image rides along
     pos.y += ripple * 0.028;
@@ -330,10 +331,12 @@ function RippleFrame({
   src,
   source,
   autoHover = false,
+  intensity = 1,
 }: {
   src?: string;
   source?: HTMLImageElement | HTMLVideoElement | null;
   autoHover?: boolean;
+  intensity?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -426,7 +429,9 @@ function RippleFrame({
     const uRippleTime = gl.getUniformLocation(program, "uRippleTime");
     const uHover = gl.getUniformLocation(program, "uHover");
     const uAspect = gl.getUniformLocation(program, "uAspect");
+    const uIntensity = gl.getUniformLocation(program, "uIntensity");
     gl.uniform1i(uMap, 0);
+    gl.uniform1f(uIntensity, intensity);
 
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -524,7 +529,7 @@ function RippleFrame({
       gl.deleteShader(vs);
       gl.deleteShader(fs);
     };
-  }, [src, source]);
+  }, [src, source, intensity]);
 
   return (
     <div
@@ -790,7 +795,7 @@ function ProjectCard({
           />
         ) : null}
         {ripple && hover && mediaRef.current ? (
-          <RippleFrame source={mediaRef.current} autoHover />
+          <RippleFrame source={mediaRef.current} autoHover intensity={1.4} />
         ) : null}
         {item.plus ? (
           <span className="pointer-events-none absolute top-3 left-3 z-[1] inline-flex items-center rounded-full bg-white px-2.5 py-1.5">
