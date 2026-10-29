@@ -11,6 +11,7 @@ services:
   - Subscriptions
   - Shopify development
 liveUrl: https://www.projectlip.com/
+liveShot: project-cosmetics-live.jpg
 featured: true
 order: 2
 tone: "#161614"

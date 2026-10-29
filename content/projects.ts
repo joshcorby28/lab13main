@@ -70,6 +70,7 @@ export const projects: Project[] = [
     services: ["Shopify development", "Store design", "E-commerce"],
     technologies: ["Shopify", "Custom theme work", "Product merchandising"],
     liveUrl: "https://goldenageoftennis.com/",
+    liveShot: "/images/projects/previews/golden-age-of-tennis-live.jpg",
     featured: true,
     category: "shopify",
     hero: {
@@ -99,6 +100,7 @@ export const projects: Project[] = [
     services: ["Shopify Plus", "Custom features", "Store optimisation"],
     technologies: ["Shopify Plus", "Liquid", "Custom sections", "Collection merchandising"],
     liveUrl: "https://hyloathletics.com/",
+    liveShot: "/images/projects/previews/hylo-athletics-live.jpg",
     featured: true,
     category: "shopify",
     hero: {
@@ -138,6 +140,7 @@ export const projects: Project[] = [
     services: ["Shopify migration", "Subscriptions", "Shopify development"],
     technologies: ["Shopify", "Subscriptions", "Customer data migration", "Product catalogue"],
     liveUrl: "https://www.projectlip.com/",
+    liveShot: "/images/projects/previews/project-cosmetics-live.jpg",
     featured: true,
     category: "shopify",
     hero: {
@@ -165,40 +168,6 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "amy-lynn",
-    title: "Amy Lynn",
-    client: "Amy Lynn",
-    industry: "Luxury womenswear",
-    summary:
-      "A new Shopify storefront on Prestige for the luxury fashion designer — custom theme work built to convert, with a measurable lift after launch.",
-    intro:
-      "Custom theme development on Shopify for luxury fashion and womenswear designer.",
-    services: ["Shopify development", "Custom theme", "Conversion"],
-    technologies: ["Shopify", "Prestige theme", "Custom features", "Theme development"],
-    liveUrl: "https://www.amylynn.co.uk/",
-    featured: true,
-    category: "shopify",
-    hero: {
-      kind: "image",
-      src: "/images/projects/amy-lynn-1.jpg",
-      alt: "Amy Lynn campaign imagery",
-    },
-    gallery: [],
-    overview:
-      "Working with the team at Amy Lynn we built a brand new Shopify website to showcase their products and gain a higher conversion rate. Working with the Prestige theme we designed and developed a stand out website with loads of custom features to expand the already strong Prestige theme.",
-    challenge:
-      "A luxury womenswear brand needed a store that could carry the clothes properly — not a stock theme drop, and not a fragile custom build. The existing catalogue needed a sharper presentation and a clearer path to purchase.",
-    solution:
-      "A new Shopify storefront based on Prestige, extended with custom features so the theme could hold a more distinctive, higher-converting experience.",
-    development:
-      "Theme customisation, new sections and functionality layered onto Prestige, designed around how Amy Lynn actually merchandises and sells.",
-    results: [
-      "Total sales increased by 60%.",
-      "Total sessions increased by 55%.",
-      "Total orders increased by 40%.",
-    ],
-  },
-  {
     slug: "maeving",
     title: "Maeving",
     client: "Maeving",
@@ -210,6 +179,7 @@ export const projects: Project[] = [
     services: ["Shopify development", "Custom functionality", "Retainer"],
     technologies: ["Shopify", "Custom product customiser", "Frontend development"],
     liveUrl: "https://maeving.com/",
+    liveShot: "/images/projects/previews/maeving-live.jpg",
     featured: true,
     category: "shopify",
     hero: { kind: "field", tone: "steel", label: "Maeving" },
@@ -234,6 +204,7 @@ export const projects: Project[] = [
     services: ["Shopify Plus", "Store rebuild", "UX"],
     technologies: ["Shopify Plus", "Custom theme work", "Navigation & merchandising"],
     liveUrl: "https://studio163.de/",
+    liveShot: "/images/projects/previews/studio-163-live.jpg",
     featured: true,
     category: "shopify",
     hero: {

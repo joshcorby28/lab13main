@@ -11,6 +11,7 @@ services:
   - Custom functionality
   - Retainer
 liveUrl: https://maeving.com/
+liveShot: maeving-live.jpg
 featured: true
 order: 4
 tone: "#243038"

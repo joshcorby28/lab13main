@@ -12,6 +12,7 @@ services:
   - Store design
   - E-commerce
 liveUrl: https://goldenageoftennis.com/
+liveShot: golden-age-of-tennis-live.jpg
 featured: true
 order: 7
 tone: "#c8a96e"

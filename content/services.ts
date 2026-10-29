@@ -46,7 +46,7 @@ export const services: Service[] = [
         body: "Go-live support, then the updates and optimisation that keep a store moving after launch.",
       },
     ],
-    relatedProjects: ["amy-lynn", "hylo-athletics", "maeving"],
+    relatedProjects: ["hylo-athletics", "maeving"],
   },
   {
     slug: "shopify-plus",
@@ -227,7 +227,7 @@ export const services: Service[] = [
         body: "The unglamorous part: updates, edge cases and the next version of the same feature.",
       },
     ],
-    relatedProjects: ["maeving", "amy-lynn", "hylo-athletics"],
+    relatedProjects: ["maeving", "hylo-athletics"],
   },
 ]
 

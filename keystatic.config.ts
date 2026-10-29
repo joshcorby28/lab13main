@@ -36,6 +36,12 @@ export default config({
           itemLabel: (props) => props.value || "Service",
         }),
         liveUrl: fields.url({ label: "Live URL" }),
+        liveShot: fields.image({
+          label: "Live site screenshot",
+          description: "Shown inside the popup fake browser. Leave empty for Preview coming soon.",
+          directory: "public/images/projects/previews",
+          publicPath: "/images/projects/previews/",
+        }),
         featured: fields.checkbox({
           label: "Show on homepage wave",
           defaultValue: true,

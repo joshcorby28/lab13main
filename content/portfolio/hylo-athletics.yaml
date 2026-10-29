@@ -11,6 +11,7 @@ services:
   - Custom features
   - Store optimisation
 liveUrl: https://hyloathletics.com/
+liveShot: hylo-athletics-live.jpg
 featured: true
 order: 1
 tone: "#1c3428"

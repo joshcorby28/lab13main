@@ -11,6 +11,7 @@ services:
   - Store rebuild
   - UX
 liveUrl: https://studio163.de/
+liveShot: studio-163-live.jpg
 featured: true
 order: 5
 tone: "#c2b39f"
