@@ -288,13 +288,25 @@ const rippleVert = /* glsl */ `
   }
 `;
 
+function mediaSourceSize(media: CanvasImageSource) {
+  if (media instanceof HTMLVideoElement) {
+    return { width: media.videoWidth, height: media.videoHeight };
+  }
+  if (media instanceof HTMLImageElement) {
+    return { width: media.naturalWidth, height: media.naturalHeight };
+  }
+  return { width: 0, height: 0 };
+}
+
 function paintRoundedFrame(
   target: HTMLCanvasElement,
-  image: HTMLImageElement,
+  image: CanvasImageSource,
   width: number,
   height: number,
   radius: number,
 ) {
+  const source = mediaSourceSize(image);
+  if (!source.width || !source.height) return;
   target.width = width;
   target.height = height;
   const ctx = target.getContext("2d");
@@ -310,18 +322,27 @@ function paintRoundedFrame(
   ctx.arcTo(0, 0, width, 0, r);
   ctx.closePath();
   ctx.clip();
-  coverDraw(ctx, image, width, height, image.naturalWidth, image.naturalHeight);
+  coverDraw(ctx, image, width, height, source.width, source.height);
   ctx.restore();
 }
 
-function RippleFrame({ src }: { src: string }) {
+function RippleFrame({
+  src,
+  source,
+  autoHover = false,
+}: {
+  src?: string;
+  source?: HTMLImageElement | HTMLVideoElement | null;
+  autoHover?: boolean;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const overlay = Boolean(source);
   const [webglReady, setWebglReady] = useState(false);
   const stateRef = useRef({
-    hover: 0,
-    hoverGoal: 0,
+    hover: autoHover ? 1 : 0,
+    hoverGoal: autoHover ? 1 : 0,
     pointer: { x: 0.5, y: 0.5 },
     pointerGoal: { x: 0.5, y: 0.5 },
     time: 0,
@@ -329,9 +350,9 @@ function RippleFrame({ src }: { src: string }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const img = imgRef.current;
+    const media = source ?? imgRef.current;
     const wrap = wrapRef.current;
-    if (!canvas || !img || !wrap) return;
+    if (!canvas || !media || !wrap) return;
 
     const gl = canvas.getContext("webgl", { alpha: true, antialias: true, premultipliedAlpha: false });
     if (!gl) return;
@@ -421,8 +442,9 @@ function RippleFrame({ src }: { src: string }) {
     let lastW = 0;
     let lastH = 0;
 
-    const paintAndUpload = () => {
-      if (!img.naturalWidth) return;
+    const paintAndUpload = (force = false) => {
+      const size = mediaSourceSize(media);
+      if (!size.width) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const cssW = wrap.clientWidth;
       const cssH = wrap.clientHeight;
@@ -430,10 +452,11 @@ function RippleFrame({ src }: { src: string }) {
       if (cssW < 2 || cssH < 2) return;
       const width = Math.max(1, Math.round(cssW * dpr));
       const height = Math.max(1, Math.round(cssH * dpr));
-      if (width !== lastW || height !== lastH || !ready) {
+      const isVideo = media instanceof HTMLVideoElement;
+      if (force || isVideo || width !== lastW || height !== lastH || !ready) {
         lastW = width;
         lastH = height;
-        paintRoundedFrame(paint, img, width, height, 18 * dpr);
+        paintRoundedFrame(paint, media, width, height, 18 * dpr);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, paint);
@@ -450,8 +473,12 @@ function RippleFrame({ src }: { src: string }) {
       }
     };
 
-    if (img.complete && img.naturalWidth) paintAndUpload();
-    else img.onload = () => paintAndUpload();
+    if (media instanceof HTMLImageElement) {
+      if (media.complete && media.naturalWidth) paintAndUpload();
+      else media.onload = () => paintAndUpload();
+    } else {
+      paintAndUpload(true);
+    }
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -487,7 +514,7 @@ function RippleFrame({ src }: { src: string }) {
       alive = false;
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", onResize);
-      img.onload = null;
+      if (media instanceof HTMLImageElement) media.onload = null;
       setWebglReady(false);
       gl.deleteTexture(texture);
       gl.deleteBuffer(posBuffer);
@@ -497,18 +524,22 @@ function RippleFrame({ src }: { src: string }) {
       gl.deleteShader(vs);
       gl.deleteShader(fs);
     };
-  }, [src]);
+  }, [src, source]);
 
   return (
     <div
       ref={wrapRef}
-      className="relative overflow-hidden rounded-[18px]"
+      className={
+        overlay
+          ? "absolute inset-0 overflow-hidden"
+          : "relative overflow-hidden rounded-[18px]"
+      }
       onPointerEnter={() => {
         stateRef.current.hoverGoal = 1;
         stateRef.current.time = 0;
       }}
       onPointerLeave={() => {
-        stateRef.current.hoverGoal = 0;
+        if (!autoHover) stateRef.current.hoverGoal = 0;
       }}
       onPointerMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -516,13 +547,15 @@ function RippleFrame({ src }: { src: string }) {
         stateRef.current.pointerGoal.y = (event.clientY - rect.top) / Math.max(rect.height, 1);
       }}
     >
-      <img
-        ref={imgRef}
-        src={src}
-        alt=""
-        className={`block w-full transition-opacity duration-200 ${webglReady ? "opacity-0" : "opacity-100"}`}
-        draggable={false}
-      />
+      {src ? (
+        <img
+          ref={imgRef}
+          src={src}
+          alt=""
+          className={`block h-auto w-full transition-opacity duration-200 ${webglReady ? "opacity-0" : "opacity-100"}`}
+          draggable={false}
+        />
+      ) : null}
       <canvas
         ref={canvasRef}
         className={`pointer-events-none absolute inset-0 h-full w-full transition-opacity duration-200 ${
@@ -702,11 +735,17 @@ function ProjectCard({
   item,
   onOpen,
   cursor,
+  ripple = false,
 }: {
   item: WaveProject;
   onOpen: () => void;
   cursor?: string;
+  ripple?: boolean;
 }) {
+  const mediaRef = useRef<HTMLImageElement | HTMLVideoElement | null>(null);
+  const [hover, setHover] = useState(false);
+  const leaveTimer = useRef<number>(0);
+
   return (
     <button
       type="button"
@@ -714,26 +753,47 @@ function ProjectCard({
       className="group relative block w-full overflow-hidden rounded-[22px] text-left"
       style={{ background: item.tone }}
       data-cursor={cursor}
+      onPointerEnter={() => {
+        if (!ripple) return;
+        window.clearTimeout(leaveTimer.current);
+        setHover(true);
+      }}
+      onPointerLeave={() => {
+        if (!ripple) return;
+        leaveTimer.current = window.setTimeout(() => setHover(false), 420);
+      }}
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden">
         {item.cardVideo ? (
           <video
+            ref={(node) => {
+              mediaRef.current = node;
+            }}
             src={item.cardVideo}
             autoPlay
             muted
             loop
             playsInline
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+            className="absolute inset-0 h-full! w-full object-cover"
+            style={{ height: "100%", objectFit: "cover" }}
           />
         ) : item.card ? (
           <img
+            ref={(node) => {
+              mediaRef.current = node;
+            }}
             src={item.card}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+            className="absolute inset-0 h-full! w-full object-cover object-top"
+            style={{ height: "100%", objectFit: "cover" }}
+            draggable={false}
           />
         ) : null}
+        {ripple && hover && mediaRef.current ? (
+          <RippleFrame source={mediaRef.current} autoHover />
+        ) : null}
         {item.plus ? (
-          <span className="pointer-events-none absolute top-3 left-3 inline-flex items-center rounded-full bg-white px-2.5 py-1.5">
+          <span className="pointer-events-none absolute top-3 left-3 z-[1] inline-flex items-center rounded-full bg-white px-2.5 py-1.5">
             <img
               src="/images/brands/shopify-plus.png"
               alt="Shopify Plus"
@@ -741,7 +801,7 @@ function ProjectCard({
             />
           </span>
         ) : null}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-5 pt-16 pb-5">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] bg-gradient-to-t from-black/75 to-transparent px-5 pt-16 pb-5">
           <p className="text-[1.35rem] leading-none tracking-[-0.03em]">{item.title}</p>
         </div>
       </div>
@@ -1601,13 +1661,14 @@ export function WavePortfolio({
       {view === "grid" ? (
         <>
           <div className="hide-scrollbar absolute inset-0 z-0 overflow-y-auto overscroll-contain">
-            <ul className="mx-auto grid max-w-[1480px] grid-cols-1 gap-4 px-5 pt-28 pb-28 sm:grid-cols-2 sm:gap-5 sm:px-8 lg:grid-cols-3 lg:px-10">
+            <ul className="grid w-full grid-cols-1 items-start gap-4 px-5 pt-28 pb-28 sm:grid-cols-2 sm:gap-5 sm:px-6 lg:grid-cols-3 lg:px-8">
               {projects.map((item, index) => (
-                <li key={item.slug}>
+                <li key={item.slug} className="min-w-0">
                   <ProjectCard
                     item={item}
                     onOpen={() => setActive(index)}
                     cursor={overlayOpen ? undefined : "Open"}
+                    ripple
                   />
                 </li>
               ))}
