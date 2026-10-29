@@ -12,10 +12,3 @@ export const site = {
   location: "Exeter, United Kingdom",
   acceptingClients: true,
 } as const;
-
-export const nav = [
-  { href: "/", label: "Work" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-] as const;

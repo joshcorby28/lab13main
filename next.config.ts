@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      toHome("/about"),
+      toHome("/contact"),
+      toHome("/services"),
+      toHome("/services/:path*"),
       toHome("/about-us"),
       toHome("/contact-us"),
       toHome("/our-work"),
