@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { site } from "@/lib/site";
 
-const MIN_DURATION = 1800;
+const MIN_DURATION = 2800;
+/** How long the fully drawn ribbon keeps rolling before the site is revealed. */
+const HOLD_DURATION = 700;
 const EASE = [0.22, 1, 0.36, 1] as const;
 const LINES = 22;
 
@@ -57,10 +59,13 @@ function drawRibbon(
       else ctx.lineTo(x, y);
     }
 
-    const alpha = 0.08 + 0.42 * centrality * centrality;
+    const alpha = 0.22 + 0.6 * centrality * centrality;
     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    ctx.lineWidth = i === Math.round(mid) ? 1.25 : 0.9;
+    ctx.lineWidth = i === Math.round(mid) ? 1.8 : 1.25;
+    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${alpha * 0.6})`;
+    ctx.shadowBlur = 6 * centrality;
     ctx.stroke();
+    ctx.shadowBlur = 0;
 
     // Bright leading point while a line is still drawing in.
     if (lineReveal < 1) {
@@ -68,8 +73,8 @@ function drawRibbon(
       const wave = Math.cos(phase);
       const y = cy + wave * amp + offset * gap * (1 + 0.55 * wave);
       ctx.beginPath();
-      ctx.arc(endX, y, 1.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.25 + 0.6 * centrality})`;
+      ctx.arc(endX, y, 1.6, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + 0.6 * centrality})`;
       ctx.fill();
     }
   }
@@ -141,8 +146,8 @@ export function SiteLoader() {
 
       if (progress >= 100 && !finished) {
         finished = true;
-        // Keep the ribbon moving through the exit fade.
-        window.setTimeout(() => setVisible(false), reduce ? 0 : 260);
+        // Let the finished ribbon roll for a beat, and keep it moving through the exit fade.
+        window.setTimeout(() => setVisible(false), reduce ? 0 : HOLD_DURATION);
       }
     };
     frame = requestAnimationFrame(tick);
@@ -176,8 +181,8 @@ export function SiteLoader() {
 
           {/* Same vignette + side fades as the wave view */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-[18%] bg-gradient-to-r from-black via-black/80 to-transparent sm:w-[22%]" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-[18%] bg-gradient-to-l from-black via-black/80 to-transparent sm:w-[22%]" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-[12%] bg-gradient-to-r from-black/90 via-black/50 to-transparent sm:w-[16%]" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-[12%] bg-gradient-to-l from-black/90 via-black/50 to-transparent sm:w-[16%]" />
 
           <motion.div
             className="pointer-events-none absolute inset-0"
