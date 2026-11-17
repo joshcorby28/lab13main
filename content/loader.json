@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "duration": 2,
   "hold": 0.7,
   "lines": 24,
