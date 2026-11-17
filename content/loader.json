@@ -1,8 +1,8 @@
 {
-  "enabled": true,
-  "duration": 2.8,
+  "enabled": false,
+  "duration": 2,
   "hold": 0.7,
-  "lines": 22,
+  "lines": 24,
   "brightness": 1,
   "label": "Loading"
 }
