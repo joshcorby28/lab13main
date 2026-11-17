@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Serif, Inter_Tight } from "next/font/google";
 import { CustomCursor } from "@/components/ui/CustomCursor";
+import { SiteLoader } from "@/components/ui/SiteLoader";
 import { organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        <SiteLoader />
         <CustomCursor />
         <main id="main">{children}</main>
       </body>
