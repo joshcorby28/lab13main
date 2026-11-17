@@ -1,20 +1,5 @@
 import { collection, config, fields, singleton } from "@keystatic/core";
-
-/**
- * Storage
- * - `npm run dev`            → local: edits write straight to files in this repo.
- * - Production (Vercel)      → Keystatic Cloud: edits are committed to GitHub and
- *                              Vercel redeploys the site automatically.
- *
- * Set NEXT_PUBLIC_KEYSTATIC_PROJECT (e.g. "lab13/lab13main") to enable Cloud.
- * NEXT_PUBLIC_KEYSTATIC_STORAGE=cloud forces Cloud locally; =local forces local.
- */
-const cloudProject = process.env.NEXT_PUBLIC_KEYSTATIC_PROJECT;
-const storageOverride = process.env.NEXT_PUBLIC_KEYSTATIC_STORAGE;
-const useCloud =
-  Boolean(cloudProject) &&
-  storageOverride !== "local" &&
-  (storageOverride === "cloud" || process.env.NODE_ENV === "production");
+import { cloudProject, useCloud } from "./lib/cms-storage";
 
 const portfolioImage = (label: string, description?: string) =>
   fields.image({
