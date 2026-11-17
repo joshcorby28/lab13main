@@ -36,9 +36,7 @@ development: >-
   Theme and section work on Shopify Plus, catalogue merchandising, and
   storefront development tailored to a high-consideration fitness retailer.
 results: []
-quote:
-  text: ''
-  attribution: ''
+quote: {}
 technologies:
   - Shopify Plus
   - Liquid
