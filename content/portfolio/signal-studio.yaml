@@ -1,19 +1,33 @@
 title: Signal Studio
+featured: false
+order: 110
+plus: false
 client: Signal Studio
 industry: Visual identity
-category: branding
-summary: >-
-  A sharp visual identity and social system for a creative studio — built to
-  move across campaigns and channels.
-result: ""
+tone: '#1c3428'
+frames: []
+intro: Visual identity and social design for Signal Studio.
 services:
   - Visual identity
   - Social design
   - Art direction
-liveUrl: null
-featured: true
-order: 12
-tone: "#1c3428"
-cardImage: null
-cardVideo: null
-frames: []
+overview: >-
+  We created an identity and template system that keeps Signal looking distinct
+  across every channel.
+challenge: >-
+  Fast-moving social and campaign work needed a system that stayed consistent
+  under pressure.
+solution: >-
+  A bold mark, layout rules and reusable templates that the team can apply
+  without losing quality.
+development: >-
+  Core identity, social templates and a lightweight brand guide for day-to-day
+  production.
+results: []
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Identity
+  - Social templates
+  - Campaign design

@@ -1,19 +1,33 @@
 title: Harbour Goods
+featured: false
+order: 100
+plus: false
 client: Harbour Goods
 industry: Packaging & brand
-category: branding
-summary: >-
-  Packaging and brand design for a lifestyle goods label — tactile print systems
-  with a calm, coastal tone.
-result: ""
+tone: '#243038'
+frames: []
+intro: Packaging and brand systems for Harbour Goods.
 services:
   - Packaging
   - Brand design
   - Print
-liveUrl: null
-featured: true
-order: 11
-tone: "#243038"
-cardImage: null
-cardVideo: null
-frames: []
+overview: >-
+  We designed packaging and supporting brand assets that feel premium on shelf
+  and consistent online.
+challenge: >-
+  The product range needed a unified look without losing the character of
+  individual lines.
+solution: >-
+  A modular packaging system with shared structure, type and colour — flexible
+  enough for new SKUs.
+development: >-
+  Print-ready artwork, dielines and a simple brand kit for future packaging
+  updates.
+results: []
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Packaging
+  - Print design
+  - Visual system

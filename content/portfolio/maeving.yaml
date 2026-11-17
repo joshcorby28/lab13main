@@ -1,21 +1,42 @@
 title: Maeving
+featured: true
+order: 50
+plus: true
 client: Maeving
 industry: Electric motorcycles
-category: shopify
-summary: >-
-  Ongoing Shopify development for Maeving — new features, issue resolution,
-  and care for the bike customiser that lets customers build their own electric bike.
-result: ""
+cardImage: /images/portfolio/maeving/cardImage.jpg
+cardVideo: /videos/portfolio/maeving/cardVideo.mp4
+tone: '#243038'
+liveUrl: https://maeving.com/
+liveShot: /images/portfolio/maeving/liveShot.jpg
+frames:
+  - /images/portfolio/maeving/frames/0.jpg
+intro: Ongoing Shopify development and customiser support for Maeving.
 services:
   - Shopify development
   - Custom functionality
   - Retainer
-liveUrl: https://maeving.com/
-liveShot: maeving-live.jpg
-featured: true
-order: 4
-tone: "#243038"
-cardImage: maeving-card.jpg
-cardVideo: maeving.mp4
-frames:
-  - maeving-full.jpg
+overview: >-
+  We’ve been working with Maeving for quite a while now helping with new
+  features, fixing issues and more. We didn’t build the original site but we’ve
+  made sure it keeps working as required.
+challenge: >-
+  A live store with a distinctive product customiser already in market. Maeving
+  needed a development partner who could extend the site and keep a complex
+  buying tool reliable.
+solution: >-
+  An ongoing engineering relationship: new features and fixes shipped against
+  the existing store, with particular attention on the customiser experience.
+development: >-
+  One great feature on the Maeving site is their unique Bike Customiser, where
+  customers can create their perfect electric bike. We worked with Maeving to
+  keep this working as required and to make sure customers have the perfect
+  experience.
+results: []
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Shopify
+  - Custom product customiser
+  - Frontend development

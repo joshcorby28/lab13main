@@ -256,10 +256,17 @@ video {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  body.has-cursor,
-  body.has-cursor * {
+  body.has-cursor:not(:has([data-cms-admin])),
+  body.has-cursor:not(:has([data-cms-admin])) * {
     cursor: none !important;
   }
+}
+
+/* CMS editor (/admin → /keystatic): plain UI — no grain, no custom cursor. */
+body:has([data-cms-admin])::before,
+body:has([data-cms-admin])::after,
+body:has([data-cms-admin]) .cursor-dot {
+  display: none;
 }
 
 .cursor-dot {

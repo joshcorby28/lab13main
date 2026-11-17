@@ -4,32 +4,9 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import * as THREE from "three";
-import { studio } from "@/content/studio";
-import { site } from "@/lib/site";
+import type { AboutContent, PortfolioItem, SiteSettings } from "@/lib/content";
 
-export type WaveProject = {
-  slug: string;
-  title: string;
-  client: string;
-  industry: string;
-  summary: string;
-  intro: string;
-  services: string[];
-  technologies: string[];
-  liveUrl?: string;
-  liveShot?: string;
-  card: string;
-  cardVideo?: string;
-  frames: string[];
-  tone: string;
-  overview: string;
-  challenge: string;
-  solution: string;
-  development: string;
-  results?: string[];
-  quote?: { text: string; attribution: string };
-  plus?: boolean;
-};
+export type WaveProject = PortfolioItem;
 
 const CARD_W = 2.85;
 const CARD_H = 1.6;
@@ -717,25 +694,6 @@ function ProjectCaseBody({ project }: { project: WaveProject }) {
   );
 }
 
-const ABOUT_PORTRAITS = {
-  joshua: {
-    name: "Joshua Corby",
-    src: "/images/studio/joshua-corby.jpg",
-  },
-  hayden: {
-    name: "Hayden Corby",
-    src: "/images/studio/hayden-corby.jpg",
-  },
-} as const;
-
-type AboutPortraitKey = keyof typeof ABOUT_PORTRAITS;
-
-function portraitKeyFor(name: string): AboutPortraitKey | null {
-  if (name === "Joshua Corby") return "joshua";
-  if (name === "Hayden Corby") return "hayden";
-  return null;
-}
-
 function ProjectCard({
   item,
   onOpen,
@@ -869,8 +827,12 @@ function ViewSwitch({
 
 export function WavePortfolio({
   shopifyProjects,
+  settings,
+  about,
 }: {
   shopifyProjects: WaveProject[];
+  settings: SiteSettings;
+  about: AboutContent;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -880,7 +842,12 @@ export function WavePortfolio({
   const [active, setActive] = useState<number | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [aboutPortrait, setAboutPortrait] = useState<AboutPortraitKey | null>(null);
+  // Index into about.people of the person whose portrait is showing.
+  const [aboutPortrait, setAboutPortrait] = useState<number | null>(null);
+  const portraitPerson = aboutPortrait === null ? undefined : about.people[aboutPortrait];
+  const showPortrait = portraitPerson?.portrait
+    ? { name: portraitPerson.name, src: portraitPerson.portrait }
+    : null;
   const [aboutHover, setAboutHover] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [view, setView] = useState<"wave" | "grid">("wave");
@@ -1821,7 +1788,7 @@ export function WavePortfolio({
           href="/"
           className="wave-chrome pointer-events-auto relative z-40 justify-self-start px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase"
         >
-          {site.shortName}
+          {settings.wordmark}
         </Link>
         {!overlayOpen ? (
           <ViewSwitch view={view} onChange={changeView} />
@@ -1838,7 +1805,7 @@ export function WavePortfolio({
             }}
             className="wave-chrome pointer-events-auto relative z-40 justify-self-end px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
           >
-            About
+            {settings.aboutLabel}
           </button>
         ) : (
           <span aria-hidden className="justify-self-end px-2 py-2" />
@@ -1851,7 +1818,7 @@ export function WavePortfolio({
           className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex items-end justify-between gap-4 px-6 py-6 sm:px-10"
         >
           <p className="wave-chrome px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/55">
-            We know Shopify
+            {settings.tagline}
           </p>
           <button
             type="button"
@@ -1862,7 +1829,7 @@ export function WavePortfolio({
             }}
             className="wave-chrome pointer-events-auto relative z-40 px-2 py-2 font-normal leading-none tracking-[0.22em] uppercase text-white/80"
           >
-            Contact
+            {settings.contactLabel}
           </button>
         </div>
       ) : null}
@@ -1956,7 +1923,7 @@ export function WavePortfolio({
                       About
                     </h2>
                     <AnimatePresence mode="wait" initial={false}>
-                      {aboutPortrait ? (
+                      {showPortrait ? (
                         <motion.div
                           key={`${aboutPortrait}-portrait-mobile`}
                           className="absolute inset-0"
@@ -1973,8 +1940,8 @@ export function WavePortfolio({
                             Go back
                           </button>
                           <img
-                            src={ABOUT_PORTRAITS[aboutPortrait].src}
-                            alt={ABOUT_PORTRAITS[aboutPortrait].name}
+                            src={showPortrait.src}
+                            alt={showPortrait.name}
                             className="h-full w-full object-cover object-[50%_28%] grayscale"
                             draggable={false}
                           />
@@ -1987,7 +1954,7 @@ export function WavePortfolio({
                             }}
                           />
                           <span className="pointer-events-none absolute inset-x-0 bottom-10 text-center text-[10px] tracking-[0.22em] uppercase text-white/55">
-                            {ABOUT_PORTRAITS[aboutPortrait].name}
+                            {showPortrait.name}
                           </span>
                         </motion.div>
                       ) : (
@@ -2000,23 +1967,22 @@ export function WavePortfolio({
                           transition={{ duration: 0.35 }}
                         >
                           <p className="max-w-[28ch] text-[0.95rem] leading-[1.5] tracking-[-0.015em] text-white/92">
-                            {studio.about}
+                            {about.about}
                           </p>
                           <p className="mt-6 max-w-[30ch] text-[9px] leading-relaxed tracking-[0.14em] uppercase text-white/40">
-                            {studio.people.map((person, index) => {
-                              const key = portraitKeyFor(person.name);
+                            {about.people.map((person, index) => {
                               const sep =
-                                index < studio.people.length - 1 ? (
+                                index < about.people.length - 1 ? (
                                   <span key={`${person.name}-sep`} className="text-white/20">
                                     {" · "}
                                   </span>
                                 ) : null;
-                              if (key) {
+                              if (person.portrait) {
                                 return (
                                   <span key={person.name}>
                                     <button
                                       type="button"
-                                      onClick={() => setAboutPortrait(key)}
+                                      onClick={() => setAboutPortrait(index)}
                                       className="tracking-[0.14em] uppercase text-white/55"
                                     >
                                       {person.name} — {person.role}
@@ -2034,7 +2000,7 @@ export function WavePortfolio({
                             })}
                           </p>
                           <a
-                            href={`mailto:${site.email}`}
+                            href={`mailto:${settings.email}`}
                             className="mt-7 text-[10px] tracking-[0.22em] uppercase text-white/70"
                           >
                             Email
@@ -2076,7 +2042,7 @@ export function WavePortfolio({
                   />
 
                   <AnimatePresence>
-                    {aboutPortrait ? (
+                    {showPortrait ? (
                       <motion.button
                         key="about-go-back"
                         type="button"
@@ -2097,7 +2063,7 @@ export function WavePortfolio({
                       About
                     </h2>
                     <AnimatePresence mode="wait" initial={false}>
-                      {aboutPortrait ? (
+                      {showPortrait ? (
                         <motion.div
                           key={`${aboutPortrait}-portrait`}
                           className="absolute inset-0 overflow-hidden rounded-full"
@@ -2107,8 +2073,8 @@ export function WavePortfolio({
                           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                         >
                           <img
-                            src={ABOUT_PORTRAITS[aboutPortrait].src}
-                            alt={ABOUT_PORTRAITS[aboutPortrait].name}
+                            src={showPortrait.src}
+                            alt={showPortrait.name}
                             className="h-full w-full object-cover object-[50%_28%] grayscale"
                             draggable={false}
                           />
@@ -2129,7 +2095,7 @@ export function WavePortfolio({
                             }}
                           />
                           <span className="pointer-events-none absolute inset-x-0 bottom-[14%] text-[10px] tracking-[0.2em] uppercase text-white/55">
-                            {ABOUT_PORTRAITS[aboutPortrait].name}
+                            {showPortrait.name}
                           </span>
                         </motion.div>
                       ) : (
@@ -2142,17 +2108,16 @@ export function WavePortfolio({
                           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                         >
                           <p className="max-w-[34ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90">
-                            {studio.about}
+                            {about.about}
                           </p>
                           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[10px] tracking-[0.16em] uppercase text-white/45">
-                            {studio.people.map((person) => {
-                              const key = portraitKeyFor(person.name);
-                              if (key) {
+                            {about.people.map((person, index) => {
+                              if (person.portrait) {
                                 return (
                                   <button
                                     key={person.name}
                                     type="button"
-                                    onClick={() => setAboutPortrait(key)}
+                                    onClick={() => setAboutPortrait(index)}
                                     className="text-[10px] tracking-[0.16em] uppercase transition-colors hover:text-white"
                                   >
                                     {person.name}
@@ -2171,7 +2136,7 @@ export function WavePortfolio({
                             })}
                           </div>
                           <a
-                            href={`mailto:${site.email}`}
+                            href={`mailto:${settings.email}`}
                             className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
                           >
                             Email
@@ -2259,13 +2224,13 @@ export function WavePortfolio({
                   />
                   <div className="absolute inset-[10.5%] flex flex-col items-center justify-center overflow-hidden rounded-full bg-[#050505] px-[12%] text-center shadow-[inset_0_0_60px_rgba(0,0,0,1)]">
                     <h2 id="contact-title" className="text-[0.95rem] leading-[1.5] tracking-[-0.015em] text-white/92">
-                      Get in touch
+                      {settings.contactHeading}
                     </h2>
                     <a
-                      href={`mailto:${site.email}`}
+                      href={`mailto:${settings.email}`}
                       className="mt-6 text-[10px] tracking-[0.18em] uppercase text-white/70 underline underline-offset-[5px]"
                     >
-                      {site.email}
+                      {settings.email}
                     </a>
                   </div>
                 </div>
@@ -2304,13 +2269,13 @@ export function WavePortfolio({
                       id="contact-title"
                       className="max-w-[20ch] text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.45] tracking-[-0.01em] text-white/90"
                     >
-                      Get in touch
+                      {settings.contactHeading}
                     </h2>
                     <a
-                      href={`mailto:${site.email}`}
+                      href={`mailto:${settings.email}`}
                       className="mt-8 text-[10px] tracking-[0.2em] uppercase text-white/70 underline underline-offset-[5px]"
                     >
-                      {site.email}
+                      {settings.email}
                     </a>
                   </div>
                 </div>

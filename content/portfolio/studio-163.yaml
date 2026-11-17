@@ -1,21 +1,41 @@
 title: Studio 163
+featured: true
+order: 60
+plus: false
 client: Studio 163
 industry: Cashmere knitwear
-category: shopify
-summary: >-
-  A complete Shopify Plus rebuild for a cashmere knitwear brand —
-  from an outdated site to a cleaner, more modern store built for luxury retail.
-result: Improved user engagement and conversion rates following the rebuild.
+cardImage: /images/portfolio/studio-163/cardImage.jpg
+tone: '#c2b39f'
+liveUrl: https://studio163.de/
+liveShot: /images/portfolio/studio-163/liveShot.jpg
+frames:
+  - /images/portfolio/studio-163/frames/0.jpg
+intro: Shopify Plus store development for a cashmere knitwear brand.
 services:
   - Shopify Plus
   - Store rebuild
   - UX
-liveUrl: https://studio163.de/
-liveShot: studio-163-live.jpg
-featured: true
-order: 5
-tone: "#c2b39f"
-cardImage: studio-163-card.jpg
-cardVideo: null
-frames:
-  - studio-163-full.jpg
+overview: >-
+  The client sought to completely revamp their outdated website, aiming to
+  create a more modern and user-friendly experience. The objectives were to
+  enhance user satisfaction through a visually appealing design and intuitive
+  navigation while aligning with current luxury fashion trends.
+challenge: >-
+  An ageing storefront that no longer matched a cashmere brand’s standard. The
+  brief was a full refresh: calmer design, clearer navigation, and a buying
+  experience that felt as considered as the product.
+solution: >-
+  A fresh, clean Shopify Plus store that transformed the site’s aesthetic and
+  made the catalogue easier to move through.
+development: >-
+  A complete rebuild focused on luxury presentation, intuitive navigation and a
+  more contemporary Shopify Plus storefront.
+results:
+  - Improved user engagement and conversion rates following the rebuild.
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Shopify Plus
+  - Custom theme work
+  - Navigation & merchandising

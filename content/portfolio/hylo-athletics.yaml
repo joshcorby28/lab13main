@@ -1,22 +1,45 @@
 title: Hylo Athletics
+featured: true
+order: 30
+plus: true
 client: Hylo Athletics
 industry: Performance footwear
-category: shopify
-summary: >-
-  Ongoing Shopify Plus partnership with the British running shoe company —
-  new features, fresh design and performance work that keeps the store moving.
-result: ""
+cardImage: /images/portfolio/hylo-athletics/cardImage.jpg
+cardVideo: /videos/portfolio/hylo-athletics/cardVideo.mp4
+tone: '#1c3428'
+liveUrl: https://hyloathletics.com/
+liveShot: /images/portfolio/hylo-athletics/liveShot.jpg
+frames:
+  - /images/portfolio/hylo-athletics/frames/0.jpg
+  - /images/portfolio/hylo-athletics/frames/1.jpg
+intro: Working on Shopify Plus with British running shoe company Hylo Athletics.
 services:
   - Shopify Plus
   - Custom features
   - Store optimisation
-liveUrl: https://hyloathletics.com/
-liveShot: hylo-athletics-live.jpg
-featured: true
-order: 1
-tone: "#1c3428"
-cardImage: hylo-athletics-card.jpg
-cardVideo: null
-frames:
-  - hylo-2.jpg
-  - hylo-1.jpg
+overview: >-
+  We’ve worked with Hylo on their Shopify Plus store for years, ensuring it
+  consistently has the freshest design, cutting-edge features, and optimised
+  performance. Our collaboration has helped maintain their brand’s competitive
+  edge in the market.
+challenge: >-
+  A live Shopify Plus storefront for a performance brand that cannot stand
+  still. Hylo needed a partner who could keep shipping new merchandising ideas
+  without compromising the quality of the existing experience.
+solution: >-
+  A long-term development relationship rather than a one-off rebuild. We stay
+  inside the live Plus store, introducing new features and unique sections while
+  protecting performance and brand consistency.
+development: >-
+  We’ve introduced new features like rolling collection pages and unique
+  sections to keep the Hylo website at the forefront, ensuring it remains fresh
+  and innovative.
+results: []
+quote:
+  text: Super quick and efficient work from Josh. Couldn't be happier!
+  attribution: Hylo
+technologies:
+  - Shopify Plus
+  - Liquid
+  - Custom sections
+  - Collection merchandising

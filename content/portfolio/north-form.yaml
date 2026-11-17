@@ -1,19 +1,33 @@
 title: North Form
+featured: false
+order: 90
+plus: false
 client: North Form
 industry: Brand identity
-category: branding
-summary: >-
-  A full visual identity for a contemporary product studio — wordmark, type
-  system, colour and brand applications.
-result: ""
+tone: '#161614'
+frames: []
+intro: Brand identity and art direction for North Form.
 services:
   - Brand identity
   - Art direction
   - Guidelines
-liveUrl: null
-featured: true
-order: 10
-tone: "#161614"
-cardImage: null
-cardVideo: null
-frames: []
+overview: >-
+  We built a clear, flexible identity system that works across packaging,
+  digital and print touchpoints.
+challenge: >-
+  A young studio needed a mark and system that felt established without looking
+  generic.
+solution: >-
+  A restrained identity built around a distinctive wordmark, a tight type
+  pairing, and a palette that holds up in both print and screen.
+development: >-
+  Deliverables included the core mark, type and colour rules, plus a short
+  guideline set for everyday use.
+results: []
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Identity
+  - Typography
+  - Brand guidelines

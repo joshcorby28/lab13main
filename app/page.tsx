@@ -1,79 +1,36 @@
-import { WavePortfolio, type WaveProject } from "@/components/experience/WavePortfolio";
-import { getFeaturedProjects, type Project } from "@/content/projects";
-import { pageMetadata } from "@/lib/seo";
-import { site } from "@/lib/site";
+import { WavePortfolio } from "@/components/experience/WavePortfolio";
+import { getAbout, getPortfolio, getSettings } from "@/lib/content";
+import { absoluteUrl } from "@/lib/utils";
+import type { Metadata } from "next";
 
-export const metadata = pageMetadata({
-  title: "Lab 13",
-  description: site.description,
-  path: "/",
-});
-
-const tones: Record<string, string> = {
-  moss: "#1c3428",
-  steel: "#243038",
-  cashmere: "#b7a898",
-  ink: "#161614",
-  sand: "#c2b39f",
-};
-
-function toWaveProject(project: Project): WaveProject {
-  const frames: string[] = [];
-  const push = (src?: string) => {
-    if (src && !frames.includes(src)) frames.push(src);
-  };
-
-  if (project.hero.kind === "image") push(project.hero.src);
-  for (const item of project.gallery) {
-    if (item.kind === "image") push(item.src);
-  }
-
-  const hasPreviewCard = project.category === "shopify";
-  const tone = project.hero.kind === "field" ? tones[project.hero.tone] : "#1a1916";
-
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  const url = absoluteUrl("/");
   return {
-    slug: project.slug,
-    title: project.title,
-    client: project.client,
-    industry: project.industry,
-    summary: project.summary,
-    intro: project.intro,
-    services: project.services,
-    technologies: project.technologies,
-    liveUrl: project.liveUrl,
-    liveShot: project.liveShot,
-    card: hasPreviewCard
-      ? `/images/projects/previews/${project.slug}-card.jpg`
-      : "",
-    cardVideo:
-      project.slug === "bowflex-uk"
-        ? "/videos/bowflex.mp4"
-        : project.slug === "maeving"
-          ? "/videos/maeving.mp4"
-          : project.slug === "hylo-athletics"
-            ? "/videos/hylo.mp4"
-            : undefined,
-    frames:
-      frames.length > 0
-        ? frames
-        : hasPreviewCard
-          ? [`/images/projects/previews/${project.slug}-full.jpg`]
-          : [],
-    tone,
-    overview: project.overview,
-    challenge: project.challenge,
-    solution: project.solution,
-    development: project.development,
-    results: project.results,
-    quote: project.quote,
-    plus:
-      project.slug === "bowflex-uk" ||
-      project.slug === "hylo-athletics" ||
-      project.slug === "maeving",
+    title: { absolute: settings.seoTitle },
+    description: settings.seoDescription,
+    alternates: { canonical: url },
+    openGraph: {
+      title: settings.seoTitle,
+      description: settings.seoDescription,
+      url,
+      siteName: settings.siteName,
+      locale: "en_GB",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: settings.seoTitle,
+      description: settings.seoDescription,
+    },
   };
 }
 
-export default function HomePage() {
-  const shopifyProjects = getFeaturedProjects("shopify").map(toWaveProject);
-  return <WavePortfolio shopifyProjects={shopifyProjects} />;
+export default async function HomePage() {
+  const [projects, settings, about] = await Promise.all([
+    getPortfolio(),
+    getSettings(),
+    getAbout(),
+  ]);
+  return <WavePortfolio shopifyProjects={projects} settings={settings} about={about} />;
 }

@@ -3,13 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { site } from "@/lib/site";
+import type { LoaderSettings } from "@/lib/content";
 
-const MIN_DURATION = 2800;
-/** How long the fully drawn ribbon keeps rolling before the site is revealed. */
-const HOLD_DURATION = 700;
 const EASE = [0.22, 1, 0.36, 1] as const;
-const LINES = 22;
 
 /**
  * Draws a ribbon of thin lines riding the same travelling cosine as the
@@ -22,23 +18,26 @@ function drawRibbon(
   height: number,
   time: number,
   reveal: number,
+  lines: number,
+  brightness: number,
 ) {
   ctx.clearRect(0, 0, width, height);
 
   const cy = height * 0.5;
   const amp = Math.min(height * 0.11, 90);
-  const gap = Math.min(height * 0.0105, 9);
+  // Keep the ribbon a similar overall thickness whatever the line count.
+  const gap = (Math.min(height * 0.0105, 9) * 22) / Math.max(lines, 1);
   // Roughly three "cards" across the viewport, like the portfolio camera.
   const k = (Math.PI * 2 * 1.35) / width;
   const step = Math.max(4, width / 260);
-  const mid = (LINES - 1) / 2;
+  const mid = (lines - 1) / 2;
 
-  for (let i = 0; i < LINES; i += 1) {
+  for (let i = 0; i < lines; i += 1) {
     const offset = i - mid;
     const centrality = 1 - Math.abs(offset) / (mid + 1);
     // Stagger each line's draw-in so the ribbon sweeps rather than wipes.
-    const stagger = Math.abs(offset) / mid;
-    const lineReveal = Math.min(1, Math.max(0, (reveal * 1.25 - stagger * 0.25)));
+    const stagger = mid > 0 ? Math.abs(offset) / mid : 0;
+    const lineReveal = Math.min(1, Math.max(0, reveal * 1.25 - stagger * 0.25));
     if (lineReveal <= 0) continue;
     const endX = width * lineReveal;
 
@@ -59,7 +58,7 @@ function drawRibbon(
       else ctx.lineTo(x, y);
     }
 
-    const alpha = 0.22 + 0.6 * centrality * centrality;
+    const alpha = Math.min(1, (0.22 + 0.6 * centrality * centrality) * brightness);
     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
     ctx.lineWidth = i === Math.round(mid) ? 1.8 : 1.25;
     ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${alpha * 0.6})`;
@@ -74,35 +73,46 @@ function drawRibbon(
       const y = cy + wave * amp + offset * gap * (1 + 0.55 * wave);
       ctx.beginPath();
       ctx.arc(endX, y, 1.6, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + 0.6 * centrality})`;
+      ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, (0.4 + 0.6 * centrality) * brightness)})`;
       ctx.fill();
     }
   }
 }
 
-export function SiteLoader() {
+export function SiteLoader({
+  settings,
+  wordmark,
+  tagline,
+}: {
+  settings: LoaderSettings;
+  wordmark: string;
+  tagline: string;
+}) {
   const pathname = usePathname();
-  const skip = pathname?.startsWith("/keystatic") ?? false;
+  const skip =
+    !settings.enabled ||
+    (pathname?.startsWith("/keystatic") ?? false) ||
+    (pathname?.startsWith("/admin") ?? false);
   const [visible, setVisible] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
+  const { duration, hold, lines, brightness } = settings;
 
   useEffect(() => {
     if (skip) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) {
-      setVisible(false);
-      return;
-    }
+    if (!canvas || !ctx) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const minDuration = reduce ? 300 : MIN_DURATION;
+    const minDuration = reduce ? 300 : duration * 1000;
+    const holdMs = reduce ? 0 : hold * 1000;
     const start = performance.now();
     let loaded = document.readyState === "complete";
     let progress = 0;
     let frame = 0;
     let finished = false;
+    let hideTimer = 0;
     let width = 0;
     let height = 0;
 
@@ -125,12 +135,11 @@ export function SiteLoader() {
     // Safety net — never trap visitors behind the loader.
     const failsafe = window.setTimeout(() => {
       loaded = true;
-    }, 6000);
+    }, Math.max(6000, minDuration + 2000));
 
     const tick = () => {
       frame = requestAnimationFrame(tick);
-      const now = performance.now();
-      const elapsed = now - start;
+      const elapsed = performance.now() - start;
       const timeShare = Math.min(1, elapsed / minDuration);
       // Creep toward 90 while loading, then run to 100 once ready.
       const goal = loaded ? 100 * timeShare : Math.min(90, 100 * timeShare);
@@ -142,12 +151,12 @@ export function SiteLoader() {
       }
 
       const eased = 1 - Math.pow(1 - progress / 100, 2);
-      drawRibbon(ctx, width, height, reduce ? 0 : elapsed * 0.001, eased);
+      drawRibbon(ctx, width, height, reduce ? 0 : elapsed * 0.001, eased, lines, brightness);
 
       if (progress >= 100 && !finished) {
         finished = true;
         // Let the finished ribbon roll for a beat, and keep it moving through the exit fade.
-        window.setTimeout(() => setVisible(false), reduce ? 0 : HOLD_DURATION);
+        hideTimer = window.setTimeout(() => setVisible(false), holdMs);
       }
     };
     frame = requestAnimationFrame(tick);
@@ -155,10 +164,11 @@ export function SiteLoader() {
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(failsafe);
+      window.clearTimeout(hideTimer);
       window.removeEventListener("load", onLoad);
       window.removeEventListener("resize", resize);
     };
-  }, [skip]);
+  }, [skip, duration, hold, lines, brightness]);
 
   return (
     <AnimatePresence>
@@ -192,11 +202,13 @@ export function SiteLoader() {
             transition={{ duration: 0.5, ease: EASE }}
           >
             <div className="absolute inset-x-0 top-0 flex items-center justify-between px-6 py-6 sm:px-10">
-              <p className="wave-chrome px-2 py-2 text-white">{site.shortName}</p>
-              <p className="wave-chrome px-2 py-2 text-white/55">Loading</p>
+              <p className="wave-chrome px-2 py-2 text-white">{wordmark}</p>
+              {settings.label ? (
+                <p className="wave-chrome px-2 py-2 text-white/55">{settings.label}</p>
+              ) : null}
             </div>
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-6 py-6 sm:px-10">
-              <p className="wave-chrome px-2 py-2 text-white/55">We know Shopify</p>
+              <p className="wave-chrome px-2 py-2 text-white/55">{tagline}</p>
               <p className="wave-chrome px-2 py-2 tabular-nums text-white/80">
                 <span ref={countRef}>000</span>
               </p>

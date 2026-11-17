@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Instrument_Serif, Inter_Tight } from "next/font/google";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { SiteLoader } from "@/components/ui/SiteLoader";
+import { getLoaderSettings, getSettings } from "@/lib/content";
 import { organizationJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -64,8 +65,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
   const jsonLd = organizationJsonLd();
+  const [settings, loader] = await Promise.all([getSettings(), getLoaderSettings()]);
 
   return (
     <html
@@ -83,7 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <SiteLoader />
+        <SiteLoader settings={loader} wordmark={settings.wordmark} tagline={settings.tagline} />
         <CustomCursor />
         <main id="main">{children}</main>
       </body>

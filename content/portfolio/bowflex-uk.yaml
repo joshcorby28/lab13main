@@ -1,21 +1,46 @@
 title: BowFlex UK
+featured: true
+order: 10
+plus: true
 client: BowFlex UK
 industry: Home fitness
-category: shopify
-summary: >-
-  Shopify Plus storefront for BowFlex UK — treadmills, Max Trainers, bikes and
-  weights, built to carry a global fitness brand in the UK market.
-result: ""
+cardImage: /images/portfolio/bowflex-uk/cardImage.jpg
+cardVideo: /videos/portfolio/bowflex-uk/cardVideo.mp4
+tone: '#111111'
+liveUrl: https://bowflex.co.uk/
+liveShot: /images/portfolio/bowflex-uk/liveShot.jpg
+frames:
+  - /images/portfolio/bowflex-uk/frames/0.jpg
+intro: >-
+  Shopify Plus development for BowFlex UK — the British storefront for the
+  American home-fitness brand.
 services:
   - Shopify Plus
   - Storefront development
   - E-commerce
-liveUrl: https://bowflex.co.uk/
-liveShot: bowflex-uk-live.jpg
-featured: true
-order: 0
-tone: "#111111"
-cardImage: bowflex-uk-card.jpg
-cardVideo: bowflex.mp4
-frames:
-  - bowflex-uk-1.jpg
+overview: >-
+  BowFlex UK is the official UK store for BowFlex home fitness — treadmills, Max
+  Trainers, indoor cycles, adjustable weights and accessories. We built and
+  support the Shopify Plus storefront that sells the range into the British
+  market, with a structure built for product discovery, comparison and
+  conversion.
+challenge: >-
+  A global fitness brand needed a UK store that could hold a dense catalogue of
+  high-ticket equipment without losing clarity — sale periods, free shipping,
+  and a path from browse to checkout that feels as considered as the machines.
+solution: >-
+  A Shopify Plus storefront organised around the core ranges, with merchandising
+  that can flex for seasonal offers while keeping product comparison and the
+  purchase journey sharp.
+development: >-
+  Theme and section work on Shopify Plus, catalogue merchandising, and
+  storefront development tailored to a high-consideration fitness retailer.
+results: []
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Shopify Plus
+  - Liquid
+  - Custom sections
+  - Product merchandising

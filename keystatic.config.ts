@@ -1,11 +1,48 @@
-import { config, fields, collection } from "@keystatic/core";
+import { collection, config, fields, singleton } from "@keystatic/core";
+
+/**
+ * Storage
+ * - `npm run dev`            → local: edits write straight to files in this repo.
+ * - Production (Vercel)      → Keystatic Cloud: edits are committed to GitHub and
+ *                              Vercel redeploys the site automatically.
+ *
+ * Set NEXT_PUBLIC_KEYSTATIC_PROJECT (e.g. "lab13/lab13main") to enable Cloud.
+ * NEXT_PUBLIC_KEYSTATIC_STORAGE=cloud forces Cloud locally; =local forces local.
+ */
+const cloudProject = process.env.NEXT_PUBLIC_KEYSTATIC_PROJECT;
+const storageOverride = process.env.NEXT_PUBLIC_KEYSTATIC_STORAGE;
+const useCloud =
+  Boolean(cloudProject) &&
+  storageOverride !== "local" &&
+  (storageOverride === "cloud" || process.env.NODE_ENV === "production");
+
+const portfolioImage = (label: string, description?: string) =>
+  fields.image({
+    label,
+    description,
+    directory: "public/images/portfolio",
+    publicPath: "/images/portfolio/",
+  });
+
+const longText = (label: string, description?: string) =>
+  fields.text({ label, description, multiline: true });
+
+const tagList = (label: string, description: string, itemLabel: string) =>
+  fields.array(fields.text({ label: itemLabel }), {
+    label,
+    description,
+    itemLabel: (props) => props.value || itemLabel,
+  });
 
 export default config({
-  storage: {
-    kind: "local",
-  },
+  storage: useCloud ? { kind: "cloud" } : { kind: "local" },
+  ...(cloudProject ? { cloud: { project: cloudProject } } : {}),
   ui: {
     brand: { name: "Lab 13" },
+    navigation: {
+      Work: ["portfolio"],
+      Site: ["settings", "about", "loader"],
+    },
   },
   collections: {
     portfolio: collection({
@@ -13,74 +50,180 @@ export default config({
       slugField: "title",
       path: "content/portfolio/*",
       format: { data: "yaml" },
+      columns: ["client", "order"],
       schema: {
-        title: fields.slug({ name: { label: "Title" } }),
-        client: fields.text({ label: "Client" }),
-        industry: fields.text({ label: "Industry" }),
-        category: fields.select({
-          label: "Portfolio",
-          options: [
-            { label: "Shopify", value: "shopify" },
-            { label: "Branding", value: "branding" },
-          ],
-          defaultValue: "shopify",
-        }),
-        summary: fields.text({ label: "Popup summary", multiline: true }),
-        result: fields.text({
-          label: "Popup result line",
-          description: "Optional highlight shown under the summary",
-          multiline: true,
-        }),
-        services: fields.array(fields.text({ label: "Service" }), {
-          label: "Services",
-          itemLabel: (props) => props.value || "Service",
-        }),
-        liveUrl: fields.url({ label: "Live URL" }),
-        liveShot: fields.image({
-          label: "Live site screenshot",
-          description: "Shown inside the popup fake browser. Leave empty for Preview coming soon.",
-          directory: "public/images/projects/previews",
-          publicPath: "/images/projects/previews/",
+        title: fields.slug({
+          name: { label: "Project name" },
+          slug: {
+            label: "Slug",
+            description: "Generated from the name. Best left as it is.",
+          },
         }),
         featured: fields.checkbox({
-          label: "Show on homepage wave",
+          label: "Show on homepage",
+          description: "Untick to hide this project without deleting it.",
           defaultValue: true,
         }),
         order: fields.integer({
-          label: "Order",
-          description: "Lower numbers appear first",
+          label: "Position",
+          description: "Lower numbers appear first. Use gaps (10, 20, 30…) so it's easy to slot projects in.",
           defaultValue: 100,
         }),
-        tone: fields.text({
-          label: "Fallback tone colour",
-          description: "Hex colour used before the card image loads",
-          defaultValue: "#1a1916",
+        plus: fields.checkbox({
+          label: "Shopify Plus badge",
+          description: "Shows the Shopify Plus logo on the card.",
+          defaultValue: false,
         }),
-        cardImage: fields.image({
-          label: "Card image",
-          description: "Main carousel card",
-          directory: "public/images/projects/previews",
-          publicPath: "/images/projects/previews/",
-        }),
+        client: fields.text({ label: "Client" }),
+        industry: fields.text({ label: "Industry" }),
+
+        cardImage: portfolioImage(
+          "Card image",
+          "Shown on the homepage card. Landscape, roughly 16:10, at least 1600px wide.",
+        ),
         cardVideo: fields.file({
           label: "Card video (optional)",
-          description: "MP4 shown on the card instead of / with the image",
-          directory: "public/videos",
-          publicPath: "/videos/",
+          description: "Short MP4 loop that plays on the card instead of the image. Keep it under 10 MB.",
+          directory: "public/videos/portfolio",
+          publicPath: "/videos/portfolio/",
         }),
-        frames: fields.array(
-          fields.image({
-            label: "Frame",
-            directory: "public/images/projects",
-            publicPath: "/images/projects/",
+        tone: fields.text({
+          label: "Card background colour",
+          description: "Hex colour shown behind the card while media loads, e.g. #1a1916",
+          defaultValue: "#1a1916",
+        }),
+
+        liveUrl: fields.url({
+          label: "Live site URL",
+          description: "Adds a link button, and shows the screenshot below in a browser frame.",
+        }),
+        liveShot: portfolioImage(
+          "Live site screenshot",
+          "Full-length page screenshot shown in the popup. Leave empty to show “Preview coming soon”.",
+        ),
+        frames: fields.array(portfolioImage("Image"), {
+          label: "Gallery images",
+          description: "Shown in the popup instead of the live site, when there's no live site URL.",
+          itemLabel: (props) => props.value?.filename ?? "Image",
+        }),
+
+        intro: longText("Intro", "Opening line at the top of the popup."),
+        services: tagList(
+          "Tags",
+          "Shown as pills under the intro, next to the client and industry.",
+          "Tag",
+        ),
+        overview: longText("Overview"),
+        challenge: longText("Challenge"),
+        solution: longText("Solution"),
+        development: longText("Development"),
+        results: tagList("Results", "Optional. One line per result.", "Result"),
+        quote: fields.object(
+          {
+            text: longText("Quote", "Leave empty to hide the quote."),
+            attribution: fields.text({ label: "Attributed to" }),
+          },
+          { label: "Client quote (optional)" },
+        ),
+        technologies: tagList("Technologies", "Shown at the bottom of the popup.", "Technology"),
+      },
+    }),
+  },
+  singletons: {
+    settings: singleton({
+      label: "Site text & settings",
+      path: "content/settings",
+      format: { data: "json" },
+      schema: {
+        siteName: fields.text({ label: "Site name", defaultValue: "Lab 13" }),
+        wordmark: fields.text({
+          label: "Wordmark",
+          description: "Top-left logo text on the homepage and loader.",
+          defaultValue: "LAB×13",
+        }),
+        email: fields.text({ label: "Contact email", defaultValue: "info@lab-13.co.uk" }),
+        tagline: fields.text({
+          label: "Homepage tagline",
+          description: "Bottom-left of the homepage and loader.",
+          defaultValue: "We know Shopify",
+        }),
+        aboutLabel: fields.text({ label: "About button", defaultValue: "About" }),
+        contactLabel: fields.text({ label: "Contact button", defaultValue: "Contact" }),
+        contactHeading: fields.text({ label: "Contact heading", defaultValue: "Get in touch" }),
+        seoTitle: fields.text({
+          label: "Google title",
+          description: "The page title shown in Google and browser tabs.",
+        }),
+        seoDescription: longText(
+          "Google description",
+          "The description shown under the title in Google and when the link is shared.",
+        ),
+      },
+    }),
+    about: singleton({
+      label: "About & team",
+      path: "content/about",
+      format: { data: "json" },
+      schema: {
+        about: longText("About text", "Shown in the middle of the About circle."),
+        people: fields.array(
+          fields.object({
+            name: fields.text({ label: "Name" }),
+            role: fields.text({ label: "Role" }),
+            portrait: fields.image({
+              label: "Portrait",
+              description: "Optional. Clicking the name shows this photo in the circle.",
+              directory: "public/images/team",
+              publicPath: "/images/team/",
+            }),
           }),
           {
-            label: "Popup gallery frames",
-            description: "Images shown in the project popup",
-            itemLabel: (props) =>
-              (typeof props.value === "string" ? props.value : null) || "Frame",
+            label: "Team",
+            itemLabel: (props) => props.fields.name.value || "Person",
           },
         ),
+      },
+    }),
+    loader: singleton({
+      label: "Loader",
+      path: "content/loader",
+      format: { data: "json" },
+      schema: {
+        enabled: fields.checkbox({
+          label: "Show loader",
+          description: "Untick to open the site straight away.",
+          defaultValue: true,
+        }),
+        duration: fields.number({
+          label: "Line sweep time (seconds)",
+          description: "Minimum time the lines take to draw across the screen.",
+          defaultValue: 2.8,
+          step: 0.1,
+          validation: { min: 0.5, max: 10 },
+        }),
+        hold: fields.number({
+          label: "Hold time (seconds)",
+          description: "How long the finished lines keep rolling before the site appears.",
+          defaultValue: 0.7,
+          step: 0.1,
+          validation: { min: 0, max: 5 },
+        }),
+        lines: fields.integer({
+          label: "Number of lines",
+          defaultValue: 22,
+          validation: { min: 4, max: 60 },
+        }),
+        brightness: fields.number({
+          label: "Line brightness",
+          description: "1 is the default. Higher is brighter.",
+          defaultValue: 1,
+          step: 0.1,
+          validation: { min: 0.2, max: 2 },
+        }),
+        label: fields.text({
+          label: "Top-right text",
+          defaultValue: "Loading",
+        }),
       },
     }),
   },

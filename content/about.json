@@ -1,0 +1,15 @@
+{
+  "about": "Lab13 is a family-run web design studio based in Exeter, UK, that specializes in Shopify Plus stores, custom apps, and digital branding.",
+  "people": [
+    {
+      "name": "Joshua Corby",
+      "role": "Founder, Developer",
+      "portrait": "/images/team/joshua-corby.jpg"
+    },
+    {
+      "name": "Hayden Corby",
+      "role": "Founder, Designer",
+      "portrait": "/images/team/hayden-corby.jpg"
+    }
+  ]
+}

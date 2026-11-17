@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // CMS — friendly entry point for editors.
+      { source: "/admin", destination: "/keystatic", permanent: false },
+      { source: "/admin/:path*", destination: "/keystatic/:path*", permanent: false },
       toHome("/about"),
       toHome("/contact"),
       toHome("/services"),

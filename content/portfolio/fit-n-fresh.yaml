@@ -1,20 +1,38 @@
 title: Fit N Fresh
+featured: true
+order: 70
+plus: false
 client: Fit N Fresh
 industry: Protein & wellness
-category: shopify
-summary: >-
-  Fit N Fresh offer handmade and tastiest ideal protein bars with low-calorie
-  and high-protein to meet various dietary needs. Delivered right to your door.
-result: ""
+cardImage: /images/portfolio/fit-n-fresh/cardImage.jpg
+tone: '#c4b8a8'
+frames:
+  - /images/portfolio/fit-n-fresh/frames/0.jpg
+intro: >-
+  Shopify store for Fit N Fresh — handmade high-protein, low-calorie bars
+  delivered to your door.
 services:
   - Shopify development
   - Store design
   - E-commerce
-liveUrl: null
-featured: true
-order: 6
-tone: "#c4b8a8"
-cardImage: fit-n-fresh-card.jpg
-cardVideo: null
-frames:
-  - fit-n-fresh-1.jpg
+overview: >-
+  Fit N Fresh make handmade protein bars built for real dietary needs — high
+  protein, low calorie, and delivered straight to the door. We built a Shopify
+  experience that puts the product and the promise front and centre.
+challenge: >-
+  A growing food brand needed a store that felt as fresh as the product, with a
+  clear path from discovery to subscription-style repeat buying.
+solution: >-
+  A clean Shopify storefront focused on the bars, dietary messaging, and a
+  simple, confident checkout journey.
+development: >-
+  Theme work, product presentation and merchandising structure tailored to a
+  direct-to-door protein brand.
+results: []
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Shopify
+  - Custom theme work
+  - Product merchandising

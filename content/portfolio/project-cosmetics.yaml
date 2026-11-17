@@ -1,22 +1,44 @@
 title: Project Cosmetics
+featured: true
+order: 40
+plus: false
 client: Project Cosmetics
 industry: Beauty
-category: shopify
-summary: >-
-  Full WooCommerce to Shopify migration — products, customers and subscriptions —
-  followed by a store experience that doubled conversion rate.
-result: 100% increase in conversion rates after moving to Shopify.
+cardImage: /images/portfolio/project-cosmetics/cardImage.jpg
+tone: '#161614'
+liveUrl: https://www.projectlip.com/
+liveShot: /images/portfolio/project-cosmetics/liveShot.jpg
+frames:
+  - /images/portfolio/project-cosmetics/frames/0.jpg
+  - /images/portfolio/project-cosmetics/frames/1.jpg
+intro: Full migration from WooCommerce to Shopify for Project Cosmetics.
 services:
   - Shopify migration
   - Subscriptions
   - Shopify development
-liveUrl: https://www.projectlip.com/
-liveShot: project-cosmetics-live.jpg
-featured: true
-order: 2
-tone: "#161614"
-cardImage: project-cosmetics-card.jpg
-cardVideo: null
-frames:
-  - project-cosmetics-1.jpg
-  - project-cosmetics-2.jpg
+overview: >-
+  We successfully moved a website from WooCommerce to Shopify, bringing over all
+  products, customers, and subscription data. We carefully exported the products
+  and customer info, making sure everything—from images to purchase
+  histories—transferred smoothly.
+challenge: >-
+  An established beauty catalogue already living on WooCommerce, with customers
+  and active subscriptions that could not be left behind. The move had to feel
+  invisible to returning buyers.
+solution: >-
+  A structured migration: products and customer records exported with images and
+  purchase histories intact, then subscription data mapped onto Shopify so
+  continuity was preserved on the new platform.
+development: >-
+  For subscriptions, we mapped the data to Shopify’s system, ensuring a seamless
+  transition. Now, everything’s running perfectly on the new platform.
+results:
+  - 100% increase in conversion rates after moving to Shopify.
+quote:
+  text: ''
+  attribution: ''
+technologies:
+  - Shopify
+  - Subscriptions
+  - Customer data migration
+  - Product catalogue
