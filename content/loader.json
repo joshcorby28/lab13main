@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "duration": 2,
-  "hold": 0.7,
+  "hold": 0.5,
   "lines": 24,
   "brightness": 1,
   "label": "Loading"
