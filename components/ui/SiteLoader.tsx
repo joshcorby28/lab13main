@@ -189,6 +189,37 @@ export function SiteLoader({
     };
   }, [skip, duration, hold, lines, brightness, style]);
 
+  useEffect(() => {
+    if (skip || style !== "text") return;
+    const el = textRef.current;
+    if (!el) return;
+
+    const fit = () => {
+      const maxH = el.clientHeight;
+      const maxW = el.clientWidth;
+      if (maxH < 8 || maxW < 8) return;
+      let low = 16;
+      let high = maxH;
+      let best = low;
+      for (let i = 0; i < 16; i += 1) {
+        const mid = (low + high) / 2;
+        el.style.fontSize = `${mid}px`;
+        const overflows = el.scrollHeight > maxH + 1 || el.scrollWidth > maxW + 1;
+        if (overflows) high = mid;
+        else {
+          best = mid;
+          low = mid;
+        }
+      }
+      el.style.fontSize = `${best}px`;
+    };
+
+    fit();
+    document.fonts?.ready.then(fit);
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [skip, style, message]);
+
   return (
     <AnimatePresence>
       {visible && !skip ? (
@@ -216,19 +247,18 @@ export function SiteLoader({
           <div className="pointer-events-none absolute inset-y-0 right-0 w-[12%] bg-gradient-to-l from-black/90 via-black/50 to-transparent sm:w-[16%]" />
 
           {style === "text" ? (
-            <div className="absolute inset-0 z-10 flex items-center px-8 sm:px-20 md:px-28">
-              <p
-                ref={textRef}
-                className="display max-w-[22ch] text-[clamp(1.65rem,3.6vw,3.15rem)] text-white"
-              >
+            <p
+              ref={textRef}
+              className="display absolute top-[5%] left-[5%] z-10 h-[90%] w-[90%] text-white"
+              style={{ lineHeight: 0.88 }}
+            >
                 {words.map((word, index) => (
                   <span key={`${word}-${index}`} data-word style={{ opacity: 0.16 }}>
                     {word}
                     {index < words.length - 1 ? " " : ""}
                   </span>
                 ))}
-              </p>
-            </div>
+            </p>
           ) : null}
 
           <motion.div
