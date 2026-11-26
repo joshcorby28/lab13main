@@ -1,7 +1,9 @@
 {
   "enabled": true,
-  "duration": 2,
-  "hold": 0.5,
+  "style": "text",
+  "duration": 2.6,
+  "hold": 0.6,
+  "message": "We work with wellbeing, food & drink, health and fashion Shopify stores to take them to the next level of conversion, style and usability.",
   "lines": 24,
   "brightness": 1,
   "label": "Loading"

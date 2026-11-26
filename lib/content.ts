@@ -51,8 +51,10 @@ export type AboutContent = {
 
 export type LoaderSettings = {
   enabled: boolean;
+  style: "lines" | "text";
   duration: number;
   hold: number;
+  message: string;
   lines: number;
   brightness: number;
   label: string;
@@ -73,8 +75,11 @@ const DEFAULT_SETTINGS: SiteSettings = {
 
 const DEFAULT_LOADER: LoaderSettings = {
   enabled: true,
+  style: "lines",
   duration: 2.8,
   hold: 0.7,
+  message:
+    "We work with wellbeing, food & drink, health and fashion Shopify stores to take them to the next level of conversion, style and usability.",
   lines: 22,
   brightness: 1,
   label: "Loading",
@@ -157,8 +162,10 @@ export const getLoaderSettings = cache(async (): Promise<LoaderSettings> => {
   if (!data) return DEFAULT_LOADER;
   return {
     enabled: data.enabled,
+    style: data.style === "text" ? "text" : "lines",
     duration: clamp(data.duration, 0.5, 10, DEFAULT_LOADER.duration),
     hold: clamp(data.hold, 0, 5, DEFAULT_LOADER.hold),
+    message: clean(data.message) || DEFAULT_LOADER.message,
     lines: Math.round(clamp(data.lines, 4, 60, DEFAULT_LOADER.lines)),
     brightness: clamp(data.brightness, 0.2, 2, DEFAULT_LOADER.brightness),
     label: clean(data.label),

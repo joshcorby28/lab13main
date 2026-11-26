@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import type { LoaderSettings } from "@/lib/content";
@@ -96,13 +96,16 @@ export function SiteLoader({
   const [visible, setVisible] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
-  const { duration, hold, lines, brightness } = settings;
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const { duration, hold, lines, brightness, style, message } = settings;
+  const words = useMemo(() => message.split(/\s+/).filter(Boolean), [message]);
 
   useEffect(() => {
     if (skip) return;
+    const isLines = style === "lines";
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    const ctx = isLines ? canvas?.getContext("2d") : null;
+    if (isLines && (!canvas || !ctx)) return;
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const minDuration = reduce ? 300 : duration * 1000;
@@ -115,8 +118,10 @@ export function SiteLoader({
     let hideTimer = 0;
     let width = 0;
     let height = 0;
+    let wordNodes: HTMLElement[] = [];
 
     const resize = () => {
+      if (!canvas || !ctx) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = window.innerWidth;
       height = window.innerHeight;
@@ -124,8 +129,10 @@ export function SiteLoader({
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
-    resize();
-    window.addEventListener("resize", resize);
+    if (isLines) {
+      resize();
+      window.addEventListener("resize", resize);
+    }
 
     const onLoad = () => {
       loaded = true;
@@ -146,16 +153,28 @@ export function SiteLoader({
       progress += (goal - progress) * 0.1;
       if (loaded && timeShare >= 1 && progress > 99.4) progress = 100;
 
-      if (countRef.current) {
-        countRef.current.textContent = String(Math.round(progress)).padStart(3, "0");
+      if (isLines && ctx) {
+        if (countRef.current) {
+          countRef.current.textContent = String(Math.round(progress)).padStart(3, "0");
+        }
+        const eased = 1 - Math.pow(1 - progress / 100, 2);
+        drawRibbon(ctx, width, height, reduce ? 0 : elapsed * 0.001, eased, lines, brightness);
+      } else {
+        if (wordNodes.length === 0 && textRef.current) {
+          wordNodes = [...textRef.current.querySelectorAll<HTMLElement>("[data-word]")];
+        }
+        const count = wordNodes.length;
+        wordNodes.forEach((node, index) => {
+          const startAt = count <= 1 ? 0 : index / count;
+          const local = Math.min(1, Math.max(0, (progress / 100 - startAt) * count));
+          const eased = local * local * (3 - 2 * local);
+          node.style.opacity = String(0.16 + 0.84 * eased);
+        });
       }
-
-      const eased = 1 - Math.pow(1 - progress / 100, 2);
-      drawRibbon(ctx, width, height, reduce ? 0 : elapsed * 0.001, eased, lines, brightness);
 
       if (progress >= 100 && !finished) {
         finished = true;
-        // Let the finished ribbon roll for a beat, and keep it moving through the exit fade.
+        // Let the finished loader sit for a beat, and keep it moving through the exit fade.
         hideTimer = window.setTimeout(() => setVisible(false), holdMs);
       }
     };
@@ -166,9 +185,9 @@ export function SiteLoader({
       window.clearTimeout(failsafe);
       window.clearTimeout(hideTimer);
       window.removeEventListener("load", onLoad);
-      window.removeEventListener("resize", resize);
+      if (isLines) window.removeEventListener("resize", resize);
     };
-  }, [skip, duration, hold, lines, brightness]);
+  }, [skip, duration, hold, lines, brightness, style]);
 
   return (
     <AnimatePresence>
@@ -177,7 +196,7 @@ export function SiteLoader({
           key="site-loader"
           role="status"
           aria-live="polite"
-          aria-label="Loading"
+          aria-label={style === "text" ? message : "Loading"}
           className="fixed inset-0 z-[150] overflow-hidden text-white"
           style={{
             background:
@@ -187,12 +206,30 @@ export function SiteLoader({
           exit={{ opacity: 0, filter: "blur(8px)", scale: 1.035 }}
           transition={{ duration: 0.8, ease: EASE }}
         >
-          <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
+          {style === "lines" ? (
+            <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
+          ) : null}
 
           {/* Same vignette + side fades as the wave view */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.45)_100%)]" />
           <div className="pointer-events-none absolute inset-y-0 left-0 w-[12%] bg-gradient-to-r from-black/90 via-black/50 to-transparent sm:w-[16%]" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-[12%] bg-gradient-to-l from-black/90 via-black/50 to-transparent sm:w-[16%]" />
+
+          {style === "text" ? (
+            <div className="absolute inset-0 z-10 flex items-center px-8 sm:px-20 md:px-28">
+              <p
+                ref={textRef}
+                className="display max-w-[22ch] text-[clamp(1.65rem,3.6vw,3.15rem)] text-white"
+              >
+                {words.map((word, index) => (
+                  <span key={`${word}-${index}`} data-word style={{ opacity: 0.16 }}>
+                    {word}
+                    {index < words.length - 1 ? " " : ""}
+                  </span>
+                ))}
+              </p>
+            </div>
+          ) : null}
 
           <motion.div
             className="pointer-events-none absolute inset-0"
@@ -203,15 +240,21 @@ export function SiteLoader({
           >
             <div className="absolute inset-x-0 top-0 flex items-center justify-between px-6 py-6 sm:px-10">
               <p className="wave-chrome px-2 py-2 text-white">{wordmark}</p>
-              {settings.label ? (
+              {style === "lines" && settings.label ? (
                 <p className="wave-chrome px-2 py-2 text-white/55">{settings.label}</p>
-              ) : null}
+              ) : (
+                <span />
+              )}
             </div>
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-6 py-6 sm:px-10">
               <p className="wave-chrome px-2 py-2 text-white/55">{tagline}</p>
-              <p className="wave-chrome px-2 py-2 tabular-nums text-white/80">
-                <span ref={countRef}>000</span>
-              </p>
+              {style === "lines" ? (
+                <p className="wave-chrome px-2 py-2 tabular-nums text-white/80">
+                  <span ref={countRef}>000</span>
+                </p>
+              ) : (
+                <span />
+              )}
             </div>
           </motion.div>
         </motion.div>
